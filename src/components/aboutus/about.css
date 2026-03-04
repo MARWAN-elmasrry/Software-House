@@ -1,0 +1,396 @@
+.about {
+  .about-cont {
+    display: flex;
+    gap: 4rem;
+    align-items: center;
+    
+    .info {
+      width: 50%;
+      
+      h1 {
+        margin: 0;
+        font-size: 4rem;
+        position: relative;
+        display: inline-block;
+        animation: fadeInUp 0.6s ease-out;
+        
+        &::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: -3px; 
+          width: 0;   
+          height: 4px; 
+          background-color: var(--active-link);
+          animation: expandUnderline 0.8s ease-out 0.3s forwards;
+        }
+      }
+      
+      p {
+        font-size: 2.2rem;
+        line-height: 1.5;
+        animation: fadeInUp 0.6s ease-out;
+        
+        &:first-of-type {
+          animation-delay: 0.2s;
+          opacity: 0;
+          animation-fill-mode: forwards;
+        }
+        
+        &:last-of-type {
+          opacity: 0;
+          animation-delay: 0.4s;
+          animation-fill-mode: forwards;
+        }
+      }
+      
+      a {
+        color: var(--active-link);
+        font-size: 2rem;
+        text-decoration: none;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        display: inline-block;
+        animation: fadeInUp 0.6s ease-out 0.6s backwards;
+        
+        &:hover {
+          opacity: 0.8;
+          transform: translateX(8px);
+        }
+      }
+    }
+    
+    .cards {
+      width: 50%;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      .card {
+        border: solid var(--active-link) 3px;
+        border-radius: 10px;
+        background-color: var(--toggle-track-background);
+        padding: 1rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            45deg,
+            transparent 30%,
+            var(--active-link) 50%,
+            transparent 70%
+          );
+          opacity: 0;
+          transform: translateX(-100%);
+          transition: all 0.6s ease;
+          z-index: 0;
+        }
+        
+        &:nth-child(2),
+        &:nth-child(3) {
+          border-style: dashed;
+        }
+        
+        &:nth-child(1) { animation-delay: 0.1s; }
+        &:nth-child(2) { animation-delay: 0.2s; }
+        &:nth-child(3) { animation-delay: 0.3s; }
+        &:nth-child(4) { animation-delay: 0.4s; }
+        
+        &:hover {
+          transform: translateY(-8px) scale(1.02);
+          box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+          border-style: solid;
+          border-width: 4px;
+          z-index: 10;
+          
+          &::before {
+            opacity: 0.1;
+            transform: translateX(100%);
+          }
+          
+          /* Make all sibling cards dashed when one is hovered */
+          ~ .card {
+            border-style: dashed;
+          }
+        }
+        
+        /* When any card is hovered, make all cards dashed except the hovered one */
+        &:has(~ .card:hover),
+        &:hover ~ .card {
+          border-style: dashed;
+        }
+        
+        .card-info {
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          z-index: 1;
+          
+          img {
+            width: 6rem;
+            height: 6rem;
+            filter: var(--img-filter);
+            object-fit: contain;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: iconBounce 0.6s ease-out backwards;
+          }
+          
+          h2 {
+            margin: 0;
+            font-size: 3rem;
+            margin-top: 2rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+            animation: fadeInScale 0.6s ease-out 0.2s backwards;
+          }
+          
+          p {
+            margin: 0;
+            margin-top: 1rem;
+            font-weight: 100;
+            font-size: 2rem;
+            opacity: 0.4;
+            transition: opacity 0.3s ease;
+            animation: fadeIn 0.6s ease-out 0.3s backwards;
+          }
+        }
+        
+        /* Enhanced hover effects for card content */
+        &:hover .card-info {
+          img {
+            transform: scale(1.1) rotate(5deg);
+          }
+          
+          h2 {
+            color: var(--active-link);
+            transform: translateX(5px);
+          }
+          
+          p {
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Keyframe Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.4;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes expandUnderline {
+  from {
+    width: 0;
+  }
+  to {
+    width: 20%;
+  }
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes iconBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+  }
+  60% {
+    transform: scale(1.1) rotate(10deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .about {
+    .about-cont {
+      flex-direction: column;
+      
+      .info,
+      .cards {
+        width: 100%;
+      }
+      
+      .info {
+        h1 {
+          font-size: 3.5rem;
+        }
+        
+        p {
+          font-size: 2rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .about {
+    .about-cont {
+      gap: 3rem;
+      
+      .info {
+        h1 {
+          font-size: 3rem;
+        }
+        
+        p {
+          font-size: 1.8rem;
+        }
+        
+        a {
+          font-size: 1.6rem;
+        }
+      }
+      
+      .cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        
+        .card {
+          padding: 1.5rem;
+          
+          &:hover {
+            transform: translateY(-4px) scale(1.01);
+          }
+          
+          .card-info {
+            img {
+              width: 5rem;
+              height: 5rem;
+            }
+            
+            h2 {
+              font-size: 2.4rem;
+              margin-top: 1.5rem;
+            }
+            
+            p {
+              font-size: 1.6rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .about {
+    .about-cont {
+      gap: 2rem;
+      
+      .info {
+        h1 {
+          font-size: 2.5rem;
+          
+          &::after {
+            height: 3px;
+          }
+        }
+        
+        p {
+          font-size: 1.6rem;
+        }
+        
+        a {
+          font-size: 1.4rem;
+        }
+      }
+      
+      .cards {
+        gap: 1.2rem;
+        
+        .card {
+          padding: 1.2rem;
+          
+          .card-info {
+            img {
+              width: 4.5rem;
+              height: 4.5rem;
+            }
+            
+            h2 {
+              font-size: 2rem;
+              margin-top: 1.2rem;
+            }
+            
+            p {
+              font-size: 1.4rem;
+              margin-top: 0.8rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about .about-cont .info h1,
+  .about .about-cont .info p,
+  .about .about-cont .info a,
+  .about .about-cont .cards .card,
+  .about .about-cont .cards .card .card-info img,
+  .about .about-cont .cards .card .card-info h2,
+  .about .about-cont .cards .card .card-info p {
+    animation: none;
+  }
+  
+  .about .about-cont .info h1::after {
+    animation: none;
+    width: 20%;
+  }
+  
+  .about .about-cont .cards .card {
+    &:hover {
+      transform: translateY(-4px);
+    }
+  }
+}

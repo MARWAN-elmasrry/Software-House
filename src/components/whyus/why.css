@@ -1,0 +1,217 @@
+.why {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--why-background);
+    padding: 70px 0 90px;
+
+    .why-title {
+        font-size: clamp(2.5rem, 6vw, 5rem);
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 2px;
+        gap: 20px;
+    }
+
+    .title-dots {
+        width: 60px;
+        height: 4px;
+        background: repeating-linear-gradient(
+            to right,
+            var(--active-link) 0 7px,
+            transparent 2px 13px
+        );
+    }
+
+    /* Cards Grid */
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(430px, 1fr));
+        gap: 30px;
+        width: 100%;
+    }
+
+    .card {
+        background: var(--why-card-background);
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 360px;
+        animation: fadeInUp 0.6s ease-out backwards;
+
+        &:hover {
+            background: var(--card-hover-bg);
+            border-color: var(--primary-green);
+            transform: translateY(-8px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px var(--primary-green-glow);
+
+            &::before {
+                opacity: 1;
+            }
+
+            .card-icon img {
+                transform: scale(1.1) rotate(5deg);
+            }
+
+            h2 {
+                color: var(--active-link);
+            }
+        }
+
+        &:nth-child(1) { animation-delay: 0.1s; }
+        &:nth-child(2) { animation-delay: 0.15s; }
+        &:nth-child(3) { animation-delay: 0.2s; }
+        &:nth-child(4) { animation-delay: 0.25s; }
+        &:nth-child(5) { animation-delay: 0.3s; }
+        &:nth-child(6) { animation-delay: 0.35s; }
+
+        /* Card Icon */
+        .card-icon {
+            padding: 1rem;
+            width: 240px;
+            margin-bottom: 28px;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            img {
+                width: 100%;
+                object-fit: contain;
+                filter: var(--img-filter);
+                transition: all 0.4s ease;
+            }
+        }
+
+        /* Card Title */
+        .h2 {
+            margin: 1rem;
+            display: flex;
+            justify-content: flex-end;
+
+            h2 {
+                font-size: 2.7rem;
+                width: 400px;
+                font-weight: 600;
+                color: var(--text-color);
+                margin-bottom: 14px;
+                line-height: 1.4;
+                transition: color 0.3s ease;
+            }
+        }
+
+        /* Card Description */
+        p {
+            padding: 1rem;
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .why {
+        .cards {
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .why {
+        padding: 70px 0 90px;
+
+        .container {
+            padding: 0 16px;
+        }
+
+        .why-title {
+            font-size: 2.2rem;
+            margin-bottom: 50px;
+            gap: 18px;
+        }
+
+        .title-dots {
+            width: 40px;
+        }
+
+        .cards {
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            padding: 36px 28px;
+            min-height: 260px;
+
+            .card-icon {
+                width: 64px;
+                height: 64px;
+                margin-bottom: 24px;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            p {
+                font-size: 0.95rem;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .why {
+        padding: 50px 0 70px;
+
+        .why-title {
+            font-size: 1.9rem;
+            gap: 15px;
+        }
+
+        .title-dots {
+            width: 30px;
+        }
+
+        .card {
+            padding: 32px 24px;
+            min-height: 240px;
+
+            .card-icon {
+                width: 56px;
+                height: 56px;
+            }
+
+            h2 {
+                font-size: 1.15rem;
+                margin-bottom: 12px;
+            }
+
+            p {
+                font-size: 0.9rem;
+                line-height: 1.65;
+            }
+        }
+    }
+}
+
+/* Animation entrance */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
