@@ -1,8 +1,9 @@
 import './index.css'
 import { LandingPage } from './Pages/landing';
-import { Package } from './Pages/package/package';
+import { Package } from './Pages/Package/Package';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Blog } from './Pages/blog/blog';
 
 export const App = () => {
 
@@ -22,6 +23,7 @@ export const App = () => {
     <Routes>
       <Route path="/" element={<LandingPage data-theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/pack" element={<Package data-theme={theme} toggleTheme={toggleTheme} />} />
+      <Route path="/blog" element={<Blog data-theme={theme} toggleTheme={toggleTheme} />} />
     </Routes>
   );
 }

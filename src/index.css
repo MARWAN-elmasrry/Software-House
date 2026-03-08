@@ -1,6 +1,7 @@
 :root{
   --background-color: #101115;
   --text-color: #F6F7FB;
+  --bordercv-color: #f6f7fb51;
   --logo-text-color: #9EFF00; 
   --img-filter: none;
   --active-link: #9EFF00;
@@ -16,6 +17,7 @@
 [data-theme='white']{
   --background-color: #F6F7FB;
   --text-color: #111827;
+  --bordercv-color: #11182751;
   --logo-text-color: #2A2F35;
   --img-filter: brightness(0) saturate(100%) invert(13%) sepia(14%) saturate(733%) hue-rotate(172deg) brightness(89%) contrast(84%);
   --active-link: #111827;
