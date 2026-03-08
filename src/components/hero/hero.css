@@ -1,6 +1,5 @@
 .hero {
-    padding-top: 100px;
-    
+    padding-top: 150px;    
     .hero-cont {
         display: flex;
         gap: 2rem;
@@ -96,7 +95,6 @@
                     background-color: var(--active-link);
                     &:hover {
                         transform: translateY(-3px);
-                        box-shadow: 0 6px 20px rgba(158, 255, 0, 0.4);
                     }
                 }
                 
@@ -107,7 +105,7 @@
                     
                     &:hover {
                         background-color: var(--active-link);
-                        color: #2f353d;
+                        color: #F6F7FB;
                         transform: translateY(-3px);
                     }
                 }

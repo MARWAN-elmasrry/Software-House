@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import Logo from '../../assets/logo.png'
 import './header.css'
 
@@ -25,15 +26,15 @@ export const Header = ({ onToggleTheme }) => {
   return (
     <header>
         <div className="head-cont">
-          <div className="logo">
+          <NavLink to="/" className="logo">
             <img src={Logo} alt="SoftWareHouseIMG" />
             <h2>Software House</h2>
-          </div>
+          </NavLink>
           
           <div className={`links ${isMenuOpen ? 'active' : ''}`}>
-            <a href="#packages" className='active' onClick={closeMenu}>Packages</a>
-            <a href="#blog" onClick={closeMenu}>Blog</a>
-            <a href="#contact" onClick={closeMenu}>Contact Us</a>
+            <NavLink to="/pack" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Packages</NavLink>
+            <NavLink to="/blog" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Blog</NavLink>
+            <NavLink to="/contact" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Contact Us</NavLink>
           </div> 
           
           <div className="header-btn">

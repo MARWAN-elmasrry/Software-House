@@ -119,6 +119,7 @@ footer {
     }
     
     h3 {
+        margin: 0;
         font-weight: 300;
         text-align: center;
         color: var(--logo-text-color);

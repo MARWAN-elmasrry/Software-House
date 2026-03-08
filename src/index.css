@@ -71,6 +71,8 @@ body {
     }
 }
 
-.container{
-  margin: 3rem;
+.container {
+    padding: 0 3rem;
+    width: 100%;
+    box-sizing: border-box;
 }
