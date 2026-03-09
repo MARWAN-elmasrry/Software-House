@@ -1,0 +1,380 @@
+.pay {
+    padding-top: 150px;
+
+    .pay-cont {
+        position: relative;
+
+        .pay-head {
+            width: 50%;
+
+            h1 {
+                margin: 0;
+                font-size: 5rem;
+            }
+
+            p {
+                font-size: 1.8rem;
+                font-weight: 300;
+            }
+
+            img {
+                filter: var(--img-filter);
+                top: -36px;
+                right: -39px;
+                position: absolute;
+                width: 28%;
+                z-index: -1;
+            }
+        }
+    }
+
+    /* ── Payment form section ── */
+    .pay-form-section {
+        display: flex;
+        gap: 32px;
+        align-items: flex-start;
+        margin-top: 80px;
+        padding-bottom: 80px;
+
+        /* ── Left: form ── */
+        .pay-form {
+            flex: 1;
+
+            .pay-form-title {
+                font-size: 2rem;
+                font-weight: 600;
+                margin: 0 0 20px 0;
+            }
+
+            .pay-methods {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 24px;
+
+                .pay-method-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    border: 1.5px solid #333;
+                    background-color: var(--background-color);
+                    color: #888;
+                    cursor: pointer;
+                    font-weight: 500;
+                    font-size: 2rem;
+                    position: relative;
+                    transition: border-color 0.2s, color 0.2s;
+
+                    &.active {
+                        border-color: var(--active-link);
+                        color: var(--text-color);
+                    }
+
+                    .pay-method-dot {
+                        width: 6px;
+                        height: 6px;
+                        border-radius: 50%;
+                        background-color: var(--active-link);
+                        position: absolute;
+                        top: 8px;
+                        right: 8px;
+                    }
+                }
+            }
+
+            .pay-divider {
+                height: 1px;
+                background-color: #2a2a2a;
+                margin-bottom: 24px;
+            }
+
+            .pay-label {
+                display: block;
+                font-size: 2rem;
+                opacity: .6;
+                margin-bottom: 10px;
+            }
+
+            .pay-input-wrap {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background-color: var(--background-color);
+                border: 1px solid #2e2e2e;
+                border-radius: 8px;
+                padding: 14px 16px;
+                margin-bottom: 12px;
+                width: 100%;
+                box-sizing: border-box;
+
+                .pay-input {
+                    background: none;
+                    border: none;
+                    outline: none;
+                    color: var(--text-color);
+                    font-size: 2rem;
+                    width: 100%;
+                }
+            }
+
+            .pay-row {
+                display: flex;
+                gap: 12px;
+            }
+        }
+
+        /* ── Right: order summary ── */
+        .pay-summary {
+            width: 50%;
+            flex-shrink: 0;
+            background-color: var(--background-color);
+            border: 2px solid var(--active-link);
+            border-radius: 16px;
+            padding: 28px;
+            box-sizing: border-box;
+
+            .pay-summary-title {
+                font-size: 2rem;
+                font-weight: 700;
+                margin: 0 0 24px 0;
+            }
+
+            .pay-plan-row {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 20px;
+
+                .pay-plan-icon {
+                    width: 48px;
+                    height: 48px;
+                    background-color: var(--background-color);
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-shrink: 0;
+                }
+
+                .pay-plan-name {
+                    flex: 1;
+                    font-weight: 600;
+                    font-size: 2rem;
+                }
+
+                .pay-plan-price {
+                    font-weight: 700;
+                    font-size: 2rem;
+                }
+            }
+
+            .pay-summary-divider {
+                height: 1px;
+                background-color: #2a2a2a;
+                margin: 16px 0;
+            }
+
+            .pay-summary-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 40px;
+
+                .pay-summary-label {
+                    color: var;
+                    font-weight: 600;
+                    font-size: 2rem;
+                }
+
+                .pay-summary-value {
+                    font-weight: 600;
+                    font-size: 2rem;
+                }
+            }
+
+            .pay-total-row {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 4px;
+
+                .pay-total-label {
+                    font-weight: 700;
+                    font-size: 2rem;
+                }
+
+                .pay-total-value {
+                    font-weight: 800;
+                    font-size: 2.4rem;
+                }
+            }
+
+            .pay-confirm-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                width: 100%;
+                padding: 18px;
+                background-color: var(--active-link);
+                color: var(--background-color);
+                border: none;
+                border-radius: 10px;
+                font-weight: 700;
+                font-size: 2rem;
+                cursor: pointer;
+                margin-top: 20px;
+                box-sizing: border-box;
+                transition: background-color 0.2s;
+
+                &:hover {
+                    color: #2a2a2a;
+                    background-color: #99ee00;
+                }
+            }
+
+            .pay-ssl {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                margin-top: 14px;
+                color: #666;
+                font-size: 1.4rem;
+            }
+        }
+    }
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+
+/* Tablet landscape: ≤ 1024px */
+@media (max-width: 1024px) {
+    .pay {
+        padding-top: 100px;
+
+        .pay-cont .pay-head {
+            width: 65%;
+
+            img {
+                width: 38%;
+                right: -10px;
+            }
+        }
+
+        .pay-form-section {
+            flex-direction: column;
+            margin-top: 60px;
+
+            .pay-form,
+            .pay-summary {
+                width: 100%;
+            }
+        }
+    }
+}
+
+/* Tablet portrait: ≤ 768px */
+@media (max-width: 768px) {
+    .pay {
+        padding-top: 80px;
+
+        .pay-cont .pay-head {
+            width: 100%;
+
+            img {
+                display: none;
+            }
+        }
+
+        .pay-form-section {
+            gap: 24px;
+            margin-top: 40px;
+            padding-bottom: 60px;
+
+            .pay-form {
+                .pay-methods {
+                    flex-direction: column;
+
+                    .pay-method-btn {
+                        width: 100%;
+                        justify-content: center;
+                        font-size: 1.6rem;
+                    }
+                }
+
+                .pay-form-title,
+                .pay-label {
+                    font-size: 1.6rem;
+                }
+
+                .pay-input-wrap .pay-input {
+                    font-size: 1.6rem;
+                }
+
+                .pay-row {
+                    flex-direction: column;
+                    gap: 0;
+                }
+            }
+
+            .pay-summary {
+                padding: 20px;
+
+                .pay-summary-title,
+                .pay-plan-name,
+                .pay-plan-price,
+                .pay-summary-label,
+                .pay-summary-value,
+                .pay-total-label,
+                .pay-confirm-btn {
+                    font-size: 1.6rem;
+                }
+
+                .pay-total-value {
+                    font-size: 2rem;
+                }
+
+                .pay-ssl {
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+}
+
+/* Mobile: ≤ 480px */
+@media (max-width: 480px) {
+    .pay {
+        padding-top: 60px;
+
+        .pay-form-section {
+            .pay-form {
+                .pay-form-title,
+                .pay-label,
+                .pay-method-btn {
+                    font-size: 1.4rem;
+                }
+
+                .pay-input-wrap .pay-input {
+                    font-size: 1.4rem;
+                }
+            }
+
+            .pay-summary {
+                .pay-summary-title,
+                .pay-plan-name,
+                .pay-plan-price,
+                .pay-summary-label,
+                .pay-summary-value,
+                .pay-total-label,
+                .pay-confirm-btn {
+                    font-size: 1.4rem;
+                }
+
+                .pay-total-value {
+                    font-size: 1.8rem;
+                }
+            }
+        }
+    }
+}

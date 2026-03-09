@@ -27,7 +27,7 @@ export const Header = ({ onToggleTheme }) => {
   return (
     <header>
         <div className="head-cont">
-          <NavLink to="/" className="logo">
+          <NavLink to="/" className="logo"  onClick={closeMenu}>
             <img src={Logo} alt="SoftWareHouseIMG" />
             <h2>Software House</h2>
           </NavLink>
