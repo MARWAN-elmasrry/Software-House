@@ -3,7 +3,7 @@ import { Header } from "../../components/header/header"
 import Easy from "../../assets/easy.png"
 import Medium from "../../assets/medium.png"
 import Advanced from "../../assets/advanced.png"
-import "./package.css"
+import "./pack.css"
 
 const plans = [
     {
