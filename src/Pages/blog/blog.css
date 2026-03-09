@@ -1,16 +1,26 @@
-.blog{
+.blog {
     padding-top: 150px;
-    .blog-cont{
-        .blog-head{
+
+    .blog-cont {
+        position: relative;
+        .blog-head {
             width: 50%;
-            h1{
-                margin  : 0;
+            h1 {
+                margin: 0;
                 font-size: 6rem;
             }
-            .btn{
+            img{
+                filter: var(--img-filter);
+                top: -36px;
+                right: -39px;
+                position:absolute;
+            }
+
+            .btn {
                 display: flex;
                 justify-content: flex-end;
-                button{
+
+                button {
                     border: 4px solid var(--bordercv-color);
                     background-color: var(--background-color);
                     border-radius: 1.5rem;
@@ -18,7 +28,197 @@
                     padding: 0 10rem 0 10rem;
                     font-size: 4rem;
                     font-weight: bolder;
-                    color: var(--text-color );
+                    color: var(--text-color);
+                }
+            }
+        }
+
+        .blog-info {
+            margin-top: 4rem;
+            display: flex;
+            justify-content: center;
+
+            .cards {
+                display: flex;
+                flex-direction: column;
+                gap: 2rem;
+                position: relative;
+                padding-left: 3rem;
+                width: 60%;
+ 
+            }
+
+            /* ── Individual card ── */
+            .card {
+                position: relative;
+
+                /* Left border — solid for important, dashed for side */
+                &.card--important {
+                    border-left: 3px solid var(--active-link, #84cc16);
+                }
+
+                &.card--side {
+                    border-left: 3px dashed var(--active-link, #84cc16);
+                }
+
+                .card-inner {
+                    display: flex;
+                    align-items: center;
+                    gap: 2rem;
+                    padding: 1rem 1.5rem;
+                    width: 100%;
+
+                    .card-img {
+                        flex-shrink: 0;
+                        width: 320px;
+                        height: 190px;
+                        border-radius: 0.75rem;
+                        overflow: hidden;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            display: block;
+                        }
+                    }
+
+                    .card-body {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5rem;
+                        flex: 1;
+
+                        .card-title {
+                            margin: 0;
+                            font-size: 2.5rem;
+                            font-weight: bold;
+                            color: var(--text-color);
+                        }
+
+                        .card-desc {
+                            margin: 0;
+                            font-size: 1.2rem;
+                            opacity: .6;
+                            font-weight: 600;
+                            color: var(--text-color);
+                        }
+
+                        .card-btn {
+                            width: max-content;
+                            display: inline-block;
+                            margin-top: 0.5rem;
+                            padding: 0.4rem 2rem;
+                            border: 2px solid var(--active-link, #84cc16);
+                            border-radius: 0.5rem;
+                            background: transparent;
+                            color: var(--text-color);
+                            font-size: 1.5rem;
+                            font-weight: bold;
+                            letter-spacing: 0.05em;
+                            text-decoration: none;
+                            cursor: pointer;
+                            transition: background 0.2s, color 0.2s;
+
+                            &:hover {
+                                background: var(--accent-color, #84cc16);
+                                color: #000;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* ── Responsive ── */
+
+/* Large tablets / small desktops */
+@media (max-width: 1200px) {
+    .blog .blog-cont .blog-info .cards {
+        width: 70%;
+    }
+}
+
+/* Tablets */
+@media (max-width: 900px) {
+    .blog {
+        .blog-cont {
+            .blog-head {
+                width: 80%;
+
+                h1 { font-size: 4rem; }
+
+                .btn button {
+                    font-size: 2.5rem;
+                    padding: 0 5rem;
+                }
+                img{
+                display: none;
+            }
+            }
+
+            .blog-info {
+                .cards { width: 90%; }
+
+                .card .card-inner {
+                    .card-img {
+                        width: 200px;
+                        height: 120px;
+                    }
+                    .card-body .card-title { font-size: 1.5rem; }
+                }
+            }
+        }
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .blog {
+        padding-top: 100px;
+
+        .blog-cont {
+            .blog-head {
+                width: 100%;
+
+                h1 { font-size: 2.5rem; }
+
+                .btn button {
+                    font-size: 1.5rem;
+                    padding: 0 2rem;
+                    margin-right: 0;
+                }
+            }
+
+            .blog-info {
+                .cards {
+                    width: 100%;
+                    padding-left: 2rem;
+                }
+
+                .card .card-inner {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 1rem;
+                    padding: 1rem;
+
+                    .card-img {
+                        width: 100%;
+                        height: 180px;
+                    }
+
+                    .card-body {
+                        width: 100%;
+
+                        .card-title { font-size: 1.25rem; }
+
+                        .card-btn {
+                            width: 100%;
+                            text-align: center;
+                        }
+                    }
                 }
             }
         }
