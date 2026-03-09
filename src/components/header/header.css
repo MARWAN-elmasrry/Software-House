@@ -9,7 +9,6 @@ header {
     padding: 1.5rem;
     z-index: 100;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    animation: slideDown 0.5s ease-out;
     .head-cont {
         display: flex;
         justify-content: space-between;
@@ -21,7 +20,6 @@ header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            animation: fadeInLeft 0.6s ease-out;
             text-decoration: none;
             
             h2 {
@@ -50,7 +48,6 @@ header {
         .links {
             display: flex;
             gap: 2rem;
-            animation: fadeIn 0.8s ease-out 0.2s backwards;
             
             a {
                 display: inline-block;
@@ -91,7 +88,6 @@ header {
                 transform: translateX(-50%);
                 bottom: -10px;
                 left: 50%;
-                animation: dashMove 20s linear infinite;
             }
         }
         
@@ -99,7 +95,6 @@ header {
             display: flex;
             align-items: center;
             gap: 1.5rem;
-            animation: fadeInRight 0.6s ease-out 0.3s backwards;
             
             .toggle {
                 position: relative;

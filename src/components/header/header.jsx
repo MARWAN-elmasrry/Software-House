@@ -21,6 +21,7 @@ export const Header = ({ onToggleTheme }) => {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
