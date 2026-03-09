@@ -3,6 +3,10 @@ import Logo from '../../assets/logo.png'
 import './footer.css'
 
 export const Footer = () => {
+    const closeMenu = () => {
+    setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
     return (
         <footer>
             <div className="container">
@@ -16,9 +20,9 @@ export const Footer = () => {
                     </div>
                     <div className="links">
                         <h2>Links</h2>
-                        <NavLink to="/pack" className={({ isActive }) => isActive ? 'active' : ''}>Packages</NavLink>
-                        <NavLink to="/blog" className={({ isActive }) => isActive ? 'active' : ''}>Blog</NavLink>
-                        <NavLink to="/contact" className={({ isActive }) => isActive ? 'active' : ''}>Contact Us</NavLink>
+                        <NavLink to="/pack" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Packages</NavLink>
+                        <NavLink to="/blog" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Blog</NavLink>
+                        <NavLink to="/contact" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Contact Us</NavLink>
                     </div>
                 </div>
             </div>
