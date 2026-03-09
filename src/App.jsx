@@ -1,17 +1,11 @@
 import './index.css'
 import { LandingPage } from './Pages/landing';
-<<<<<<< HEAD
-import { Package } from './Pages/package/Package';
-import { Blog } from './Pages/blog/blog';
-import { Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
-=======
+
 import { Package } from './Pages/Package/Package';
 import { Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Blog } from './Pages/blog/blog';
 import { Payment } from './Pages/payment/pay';
->>>>>>> c9e30e3 (payment page done)
 
 export const App = () => {
 
