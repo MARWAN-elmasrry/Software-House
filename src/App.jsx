@@ -1,6 +1,6 @@
 import './index.css'
 import { LandingPage } from './Pages/landing';
-import { Package } from './Pages/Package/Package';
+import { Package } from './Pages/Package/package';
 import { Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Blog } from './Pages/blog/blog';
