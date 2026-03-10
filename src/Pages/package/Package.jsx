@@ -4,6 +4,7 @@ import Easy from "../../assets/easy.png"
 import Medium from "../../assets/medium.png"
 import Advanced from "../../assets/advanced.png"
 import "./pack.css"
+import { Link } from "react-router-dom"
 
 const plans = [
     {
@@ -60,6 +61,11 @@ const plans = [
 ]
 
 export const Package = ({ theme, toggleTheme }) => {
+
+    const closeMenu = () => {
+    setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
     return (
         <div data-theme={theme}>
             <Header onToggleTheme={toggleTheme} />
@@ -90,10 +96,11 @@ export const Package = ({ theme, toggleTheme }) => {
 
                                     <p className="card-tagline">{plan.tagline}</p>
                                     <div className="card-price">{plan.price}</div>
-
+                             <Link style={{textDecoration:"none"}} to="/pay" onClick={closeMenu}>
                                     <button className={`card-cta ${plan.ctaStyle}`}>
                                         {plan.cta}
                                     </button>
+                             </Link>
 
                                     <div className="features-label">{plan.featuresLabel}</div>
 

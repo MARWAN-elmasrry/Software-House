@@ -1,8 +1,13 @@
 import Lines from "../../assets/lines.png"
 import Dashes from "../../assets/dashes.png"
 import "./ready.css"
+import { Link } from "react-router-dom"
 
 export const Ready = () =>{
+    const closeMenu = () => {
+    setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
     return(<>
         <div className="ready">
             <div className="container">
@@ -16,7 +21,9 @@ export const Ready = () =>{
                         
                         <div className="ready-buttons">
                             <button className="schedule-btn">Schedule a Consultation</button>
-                            <button className="view-services-btn">View Services</button>
+                             <Link to="/pack" onClick={closeMenu}>
+                                <button className="view-services-btn">View Services</button>
+                             </Link>
                         </div>
                     </div>
                 </div>

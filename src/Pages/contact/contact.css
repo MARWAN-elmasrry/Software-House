@@ -1,0 +1,223 @@
+.contact {
+    padding-top: 200px;
+    padding-bottom: 150px;
+    background-color: var(--background-color);
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+
+    .lines {
+        filter: var(--img-filter);
+        bottom: 0;
+        left: 0;
+        width: 500px;
+        position: absolute;
+    }
+
+    .dashed {
+        filter: var(--img-filter);
+        top: 0;
+        right: 0;
+        width: 500px;
+        position: absolute;
+    }
+
+    & .cont-cont {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        min-height: 480px;
+        position: relative;
+        width: 100%;
+    }
+
+    & .right {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+        position: relative;
+
+        &::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--active-link);
+            opacity: 0.5;
+        }
+
+        & img {
+            filter: var(--img-filter);
+            width: 180px;
+            height: auto;
+        }
+    }
+
+    & .left {
+        flex: 1.2;
+        padding: 3rem 2.5rem;
+    }
+
+    & .contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.4rem;
+    }
+
+    & .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        & label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        & input,
+        & textarea {
+            background: var(--background-color);
+            border: 1.5px solid #2e2e2e;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            color: #f0f0f0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+            width: 100%;
+            box-sizing: border-box;
+
+            &:focus {
+                border-color: #a3e635;
+                box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.12);
+            }
+        }
+
+        & textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+    }
+
+    & .submit-btn {
+        background-color: var(--active-link);
+        color: var(--background-color);
+        border: none;
+        border-radius: 6px;
+        padding: 0.85rem 2rem;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+        width: 100%;
+        margin-top: 0.4rem;
+
+        &:hover {
+            background: #bef264;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(163, 230, 53, 0.3);
+            color: #2e2e2e;
+
+            & .arrow {
+                transform: translateX(4px);
+            }
+        }
+
+        &:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        & .arrow {
+            font-size: 1.1rem;
+            transition: transform 0.2s ease;
+        }
+    }
+
+    /* ── Tablet ── */
+    @media (max-width: 900px) {
+        padding-top: 140px;
+        padding-bottom: 100px;
+
+        .lines,
+        .dashed {
+            width: 320px;
+        }
+
+        & .right {
+            padding: 2rem 1.5rem;
+
+            & img {
+                width: 140px;
+            }
+        }
+
+        & .left {
+            padding: 2rem 1.5rem;
+        }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+        padding-top: 100px;
+        padding-bottom: 80px;
+
+        .lines,
+        .dashed {
+            width: 200px;
+            opacity: 0.5;
+        }
+
+        & .cont-cont {
+            flex-direction: column;
+            min-height: unset;
+        }
+
+        & .right {
+            width: 100%;
+            padding: 2rem 1rem 1.5rem;
+
+            &::after {
+                display: none;
+            }
+
+            & img {
+                width: 100px;
+            }
+        }
+
+        & .left {
+            width: 100%;
+            padding: 1rem 1rem 2rem;
+            box-sizing: border-box;
+        }
+
+        & .form-group {
+            & label {
+                font-size: 0.85rem;
+            }
+
+            & input,
+            & textarea {
+                font-size: 0.9rem;
+                padding: 0.65rem 0.85rem;
+            }
+        }
+
+        & .submit-btn {
+            font-size: 0.95rem;
+            padding: 0.75rem 1.5rem;
+        }
+    }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import './hero.css'
 import Git from '../../assets/git.png';
+import { Link } from 'react-router-dom';
 
 export const Hero = () => {
     const canvasRef = useRef(null);
@@ -142,6 +143,10 @@ export const Hero = () => {
         };
     }, []);
 
+    const closeMenu = () => {
+    setIsMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
     return (
         <div className="hero">
             <div className="container">
@@ -156,7 +161,9 @@ export const Hero = () => {
                         <p>We build specialized software solutions for complex enterprise challenges. No templates, just rigorous engineering designed for scale.</p>
                         <div className="btns">
                             <div className="start-btn">
-                                <button>Start a Project</button>
+                                 <Link to="/pack" onClick={closeMenu}>
+                                    <button>Start a Project</button>
+                                 </Link>
                             </div>
                             <div className="view-case">
                                 <button>View Case Studies</button>

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import Logo from '../../assets/logo.png'
 import './header.css'
 
@@ -59,7 +59,9 @@ export const Header = ({ onToggleTheme }) => {
               </label>
             </div>
             <div className="start-btn">
-              <button>Start a Project</button>
+              <Link to="/pack">
+                <button>Start a Project</button>
+              </Link>
             </div>
             <button className="hamburger" onClick={toggleMenu} aria-label="Toggle menu">
               <span className={isMenuOpen ? 'active' : ''}></span>
