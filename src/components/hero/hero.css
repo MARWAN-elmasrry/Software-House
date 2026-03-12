@@ -100,7 +100,6 @@
                 
                 .view-case button {
                     background-color: transparent;
-                    color: var(--text-color);
                     border: 2px solid var(--active-link);
                     
                     &:hover {

@@ -68,7 +68,6 @@
 
                     &.active {
                         border-color: var(--active-link);
-                        color: var(--text-color);
                     }
 
                     .pay-method-dot {
@@ -112,7 +111,6 @@
                     background: none;
                     border: none;
                     outline: none;
-                    color: var(--text-color);
                     font-size: 2rem;
                     width: 100%;
                 }

@@ -34,7 +34,6 @@
                 position: absolute;
                 bottom: 0;
                 right: -15px;
-                color: var(--text-color);
                 font-size: 70px;
                 font-weight: bold;
                 font-style: italic;
@@ -44,13 +43,11 @@
 
         .info {
             flex: 1;
-            color: var(--text-color);
 
             p {
                 font-size: 25px;
                 line-height: 1.7;
                 margin-bottom: 25px;
-                color: var(--text-color);
                 font-weight: 300;
                 letter-spacing: 0.3px;
                 opacity: 0.9;
@@ -73,7 +70,6 @@
                 font-size: 22px;
                 font-weight: 600;
                 margin-bottom: 8px;
-                color: var(--text-color);
 
                 &:hover {
                     color: var(--logo-text-color);

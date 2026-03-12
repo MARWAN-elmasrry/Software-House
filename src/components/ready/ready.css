@@ -61,7 +61,6 @@
 
 .ready .ready-cont .ready-card p {
     font-size: 16px;
-    color: var(--text-color);
     opacity: 0.8;
     line-height: 1.6;
     margin-bottom: 40px;

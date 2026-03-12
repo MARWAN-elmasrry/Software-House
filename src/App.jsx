@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { Blog } from './Pages/blog/blog';
 import { Payment } from './Pages/payment/pay';
 import { Contact } from './Pages/contact/contact';
+import { Admin } from './Pages/adnim/admin';
 
 export const App = () => {
 
@@ -28,6 +29,7 @@ export const App = () => {
       <Route path="/blog" element={<Blog data-theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/pay" element={<Payment data-theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/contact" element={<Contact data-theme={theme} toggleTheme={toggleTheme} />} />
+      <Route path="/admin" element={<Admin data-theme={theme} toggleTheme={toggleTheme} />} />
     </Routes>
   );
 }

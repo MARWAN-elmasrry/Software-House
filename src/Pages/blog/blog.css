@@ -29,9 +29,9 @@
                     padding: 0 10rem 0 10rem;
                     font-size: 4rem;
                     font-weight: bolder;
-                    color: var(--text-color);
                     transition: transform 0.3s ease, box-shadow 0.3s ease;
-                    
+                                        color: var(--text-color);
+
                     &:hover {
                         transform: translateY(-3px);
                         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -125,7 +125,6 @@
                             margin: 0;
                             font-size: 2.5rem;
                             font-weight: bold;
-                            color: var(--text-color);
                             transition: color 0.3s ease;
                         }
 
@@ -134,7 +133,6 @@
                             font-size: 1.2rem;
                             opacity: .6;
                             font-weight: 600;
-                            color: var(--text-color);
                             transition: opacity 0.3s ease;
                         }
 
@@ -146,13 +144,13 @@
                             border: 2px solid var(--active-link, #84cc16);
                             border-radius: 0.5rem;
                             background: transparent;
-                            color: var(--text-color);
                             font-size: 1.5rem;
                             font-weight: bold;
                             letter-spacing: 0.05em;
                             text-decoration: none;
                             cursor: pointer;
                             transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+                    color: var(--text-color);
 
                             &:hover {
                                 background-color: var(--text-color);
