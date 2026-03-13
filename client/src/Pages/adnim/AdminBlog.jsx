@@ -1,31 +1,11 @@
-import { useState } from "react";
-
-const initialProjects = [
-  {
-    id: 1,
-    title: "This Main Proj",
-    description: "This Main Proj",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=250&fit=crop",
-    important: true,
-    link: "#",
-  },
-  {
-    id: 2,
-    title: "This Side Proj",
-    description: "This Main Proj",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=250&fit=crop",
-    important: false,
-    link: "#",
-  },
-  {
-    id: 3,
-    title: "Another Main Proj",
-    description: "This Main Proj",
-    image: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400&h=250&fit=crop",
-    important: true,
-    link: "#",
-  },
-];
+import { useEffect, useState } from "react";
+import {
+  getAllBlogs,
+  createBlog,
+  updateBlog,
+  deleteBlog,
+  toggleImportant as toggleImportantApi,
+} from "../../api/service/blogServ";
 
 const emptyForm = { title: "", description: "", image: "", important: false, link: "" };
 
@@ -59,7 +39,7 @@ const StarIcon = ({ filled }) => (
 // ── Modal ──────────────────────────────────────────────────
 const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
   <div className="ab-overlay" onClick={onClose}>
-    <div className="ab-modal" onClick={e => e.stopPropagation()}>
+    <div className="ab-modal" onClick={(e) => e.stopPropagation()}>
       <div className="ab-modal__header">
         <h2 className="ab-modal__title">{isEdit ? "Edit Project" : "New Project"}</h2>
         <button className="ab-modal__close" onClick={onClose}>✕</button>
@@ -68,22 +48,22 @@ const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
       <div className="ab-modal__body">
         <label className="ab-field">
           <span>Title</span>
-          <input value={form.title} onChange={e => onChange("title", e.target.value)} placeholder="Project title" />
+          <input value={form.title} onChange={(e) => onChange("title", e.target.value)} placeholder="Project title" />
         </label>
         <label className="ab-field">
           <span>Description</span>
-          <textarea value={form.description} onChange={e => onChange("description", e.target.value)} placeholder="Short description" rows={3} />
+          <textarea value={form.description} onChange={(e) => onChange("description", e.target.value)} placeholder="Short description" rows={3} />
         </label>
         <label className="ab-field">
           <span>Image URL</span>
-          <input value={form.image} onChange={e => onChange("image", e.target.value)} placeholder="https://..." />
+          <input value={form.image} onChange={(e) => onChange("image", e.target.value)} placeholder="https://..." />
         </label>
         <label className="ab-field">
           <span>Link</span>
-          <input value={form.link} onChange={e => onChange("link", e.target.value)} placeholder="https://..." />
+          <input value={form.link} onChange={(e) => onChange("link", e.target.value)} placeholder="https://..." />
         </label>
         <label className="ab-field ab-field--row">
-          <input type="checkbox" checked={form.important} onChange={e => onChange("important", e.target.checked)} />
+          <input type="checkbox" checked={form.important} onChange={(e) => onChange("important", e.target.checked)} />
           <span>Mark as important / featured</span>
         </label>
       </div>
@@ -98,35 +78,77 @@ const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
 
 // ── Main Component ─────────────────────────────────────────
 export const AdminBlog = () => {
-  const [projects, setProjects] = useState(initialProjects);
-  const [modal, setModal] = useState(null); // null | "add" | "edit"
-  const [form, setForm] = useState(emptyForm);
-  const [editId, setEditId] = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
+  const [projects, setProjects]   = useState([]);
+  const [modal, setModal]         = useState(null); // null | "add" | "edit"
+  const [form, setForm]           = useState(emptyForm);
+  const [editId, setEditId]       = useState(null);
+  const [deleteId, setDeleteId]   = useState(null);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
 
-  const handleField = (key, val) => setForm(f => ({ ...f, [key]: val }));
+  // ─── Fetch on mount ──────────────────────────────────────
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const res = await getAllBlogs();
+        setProjects(res.data);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBlogs();
+  }, []);
 
-  const openAdd = () => { setForm(emptyForm); setModal("add"); };
-  const openEdit = (p) => { setForm({ title: p.title, description: p.description, image: p.image, important: p.important, link: p.link }); setEditId(p.id); setModal("edit"); };
+  const handleField = (key, val) => setForm((f) => ({ ...f, [key]: val }));
+
+  const openAdd   = () => { setForm(emptyForm); setModal("add"); };
+  const openEdit  = (p) => { setForm({ title: p.title, description: p.description, image: p.image, important: p.important, link: p.link }); setEditId(p._id); setModal("edit"); };
   const closeModal = () => { setModal(null); setEditId(null); };
 
-  const handleSave = () => {
+  // ─── Create / Update ─────────────────────────────────────
+  const handleSave = async () => {
     if (!form.title.trim()) return;
-    if (modal === "add") {
-      setProjects(prev => [...prev, { ...form, id: Date.now() }]);
-    } else {
-      setProjects(prev => prev.map(p => p.id === editId ? { ...p, ...form } : p));
+    try {
+      if (modal === "add") {
+        const res = await createBlog(form);
+        setProjects((prev) => [...prev, res.data]);
+      } else {
+        const res = await updateBlog(editId, form);
+        setProjects((prev) => prev.map((p) => p._id === editId ? res.data : p));
+      }
+      closeModal();
+    } catch (err) {
+      setError(err);
     }
-    closeModal();
   };
 
-  const handleDelete = (id) => {
-    setProjects(prev => prev.filter(p => p.id !== id));
-    setDeleteId(null);
+  // ─── Delete ───────────────────────────────────────────────
+  const handleDelete = async (id) => {
+    try {
+      await deleteBlog(id);
+      setProjects((prev) => prev.filter((p) => p._id !== id));
+      setDeleteId(null);
+    } catch (err) {
+      setError(err);
+    }
   };
 
-  const toggleImportant = (id) =>
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, important: !p.important } : p));
+  // ─── Toggle Featured ⭐ ───────────────────────────────────
+  const toggleImportant = async (id) => {
+    try {
+      const res = await toggleImportantApi(id);
+      setProjects((prev) => prev.map((p) => p._id === id ? res.data : p));
+    } catch (err) {
+      setError(err);
+    }
+  };
+
+  // ─── UI States ────────────────────────────────────────────
+  if (loading) return <div className="ab"><p style={{ padding: "2rem" }}>Loading blog projects...</p></div>;
+  if (error)   return <div className="ab"><p style={{ padding: "2rem", color: "red" }}>Error: {error}</p></div>;
 
   return (
     <div className="ab">
@@ -134,7 +156,9 @@ export const AdminBlog = () => {
       <div className="ab__topbar">
         <div>
           <h1 className="ab__title">Blog Projects</h1>
-          <p className="ab__subtitle">{projects.length} project{projects.length !== 1 ? "s" : ""} · {projects.filter(p => p.important).length} featured</p>
+          <p className="ab__subtitle">
+            {projects.length} project{projects.length !== 1 ? "s" : ""} · {projects.filter((p) => p.important).length} featured
+          </p>
         </div>
         <button className="ab-btn ab-btn--primary" onClick={openAdd}>
           <PlusIcon /> Add Project
@@ -143,8 +167,8 @@ export const AdminBlog = () => {
 
       {/* Cards Grid */}
       <div className="ab__grid">
-        {projects.map(p => (
-          <div key={p.id} className={`ab-card ${p.important ? "ab-card--featured" : ""}`}>
+        {projects.map((p) => (
+          <div key={p._id} className={`ab-card ${p.important ? "ab-card--featured" : ""}`}>
             <div className="ab-card__img">
               <img src={p.image} alt={p.title} />
               {p.important && <span className="ab-card__badge">Featured</span>}
@@ -158,14 +182,14 @@ export const AdminBlog = () => {
               <button
                 className={`ab-icon-btn ${p.important ? "ab-icon-btn--star" : ""}`}
                 title={p.important ? "Unfeature" : "Feature"}
-                onClick={() => toggleImportant(p.id)}
+                onClick={() => toggleImportant(p._id)}
               >
                 <StarIcon filled={p.important} />
               </button>
               <button className="ab-icon-btn" title="Edit" onClick={() => openEdit(p)}>
                 <EditIcon />
               </button>
-              <button className="ab-icon-btn ab-icon-btn--danger" title="Delete" onClick={() => setDeleteId(p.id)}>
+              <button className="ab-icon-btn ab-icon-btn--danger" title="Delete" onClick={() => setDeleteId(p._id)}>
                 <TrashIcon />
               </button>
             </div>
@@ -195,7 +219,7 @@ export const AdminBlog = () => {
       {/* Delete Confirm */}
       {deleteId && (
         <div className="ab-overlay" onClick={() => setDeleteId(null)}>
-          <div className="ab-modal ab-modal--sm" onClick={e => e.stopPropagation()}>
+          <div className="ab-modal ab-modal--sm" onClick={(e) => e.stopPropagation()}>
             <div className="ab-modal__header">
               <h2 className="ab-modal__title">Delete Project?</h2>
             </div>
