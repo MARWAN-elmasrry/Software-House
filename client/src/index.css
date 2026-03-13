@@ -1,0 +1,81 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap");
+:root{
+  --background-color: #101115;
+  --text-color: #F6F7FB;
+  --bordercv-color: #f6f7fb51;
+  --logo-text-color: #9EFF00; 
+  --img-filter: none;
+  --active-link: #9EFF00;
+  --toggle-track-background:#2f353d;
+  --toggle-thumb-background:#9EFF00;
+  --why-background:#111418;
+  --why-card-background:#2A2F35;
+  --toggle-thumb-border:none;
+  --ready-background:#2A2F3566;
+  --gradient-span:linear-gradient(to right, var(--logo-text-color) , var(--text-color))
+}
+
+[data-theme='white']{
+  --background-color: #F6F7FB;
+  --text-color: #111827;
+  --bordercv-color: #11182751;
+  --logo-text-color: #2A2F35;
+  --img-filter: brightness(0) saturate(100%) invert(13%) sepia(14%) saturate(733%) hue-rotate(172deg) brightness(89%) contrast(84%);
+  --active-link: #111827;
+  --toggle-track-background:transparent;
+  --toggle-thumb-background:#2f353d;
+  --why-background:#E5E5E5;
+  --why-card-background:#FFFFFF;
+  --toggle-thumb-border:solid 1px #2f353d;
+  --ready-background:#9EFF00;
+}
+
+body {
+  font-family: "Rajdhani", sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+::selection {
+  background: transparent;
+}
+.start-btn {
+    button {
+        color: var(--background-color);
+        background: var(--logo-text-color);
+        border: none;
+        padding: 0.8rem 1.8rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+    button:hover {
+        opacity: 0.85;
+    }
+}
+.view-case {
+    button {
+        color: var(--text-color);
+        background: transparent;
+        border: 2px solid var(--logo-text-color);
+        padding: 0.8rem 1.8rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s ease;
+        opacity: 0.6;
+    }
+    button:hover {
+        opacity: 0.85;
+    }
+}
+
+.container {
+    padding: 0 3rem;
+    width: 100%;
+    box-sizing: border-box;
+}
