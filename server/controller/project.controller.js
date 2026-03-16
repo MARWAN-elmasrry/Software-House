@@ -24,7 +24,6 @@ export const getAllProjects = async (req, res) => {
       filter.status = status;
     }
 
-    // ─── filter by section (web / ai / 3d) ───────────────
     if (section) {
       const allowed = ["web", "ai", "3d"];
       if (!allowed.includes(section)) {
@@ -53,13 +52,16 @@ export const getAllProjects = async (req, res) => {
   }
 };
 
-// ─── GET /api/projects/stats ──────────────────────────────────────────────────
 
 export const getStats = async (req, res) => {
   try {
-    const [counts, avgProgress] = await Promise.all([
+    const [counts, avgProgress, revenueResult] = await Promise.all([
+      // count by status
       Project.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+      // average progress
       Project.aggregate([{ $group: { _id: null, avg: { $avg: "$progress" } } }]),
+      // total revenue
+      Project.aggregate([{ $group: { _id: null, total: { $sum: "$price" } } }]),
     ]);
 
     const stats = { active: 0, review: 0, done: 0, total: 0 };
@@ -67,9 +69,16 @@ export const getStats = async (req, res) => {
       stats[_id] = count;
       stats.total += count;
     });
+
     stats.averageProgress = avgProgress[0]?.avg
       ? Math.round(avgProgress[0].avg)
       : 0;
+
+    // total revenue — sum of all project prices
+    stats.totalRevenue = revenueResult[0]?.total ?? 0;
+
+    // pending leads — projects still in "review"
+    stats.pendingLeads = stats.review;
 
     sendSuccess(res, stats);
   } catch (error) {

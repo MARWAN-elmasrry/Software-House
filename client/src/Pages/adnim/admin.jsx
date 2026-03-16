@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { AdminBlog } from "./AdminBlog";
 import { AdminProjects } from "./AdminProjects";
 import { Link } from "react-router-dom";
-import { GetContact } from "../../api/service/adminServ";
+import { GetContact , getStats } from "../../api/service/adminServ";
 import "./admin.css";
 
 // ── Icons ──────────────────────────────────────────────────
@@ -67,18 +67,9 @@ const Spinner = () => (
   </svg>
 );
 
-// ── Data ───────────────────────────────────────────────────
-const metrics = [
-  { label: "Total Revenue",   value: "$124,500", badge: "+12%",         Icon: RevenueIcon },
-  { label: "Active Projects", value: "12",       badge: "+2 this week", Icon: ProjectsMetricIcon },
-  { label: "Pending Leads",   value: "5",        badge: "+5 new",       Icon: LeadsIcon },
-];
-
-const NAV = [
-  { id: "dashboard", label: "dashboard", Icon: DashboardIcon },
-  { id: "projects",  label: "Projects",  Icon: ProjectsIcon  },
-  { id: "blog",      label: "Blog",      Icon: BlogIcon      },
-];
+// ── Helpers ────────────────────────────────────────────────
+const fmtCurrency = (n) =>
+  "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: 0 });
 
 // ── Login styles ───────────────────────────────────────────
 const loginStyles = `
@@ -259,13 +250,19 @@ const loginStyles = `
 const MAX_ATTEMPTS = 3;
 const VALID_CREDS = { username: "admin", password: "admin" };
 
+const NAV = [
+  { id: "dashboard", label: "dashboard", Icon: DashboardIcon },
+  { id: "projects",  label: "Projects",  Icon: ProjectsIcon  },
+  { id: "blog",      label: "Blog",      Icon: BlogIcon      },
+];
+
 // ── Login Page ─────────────────────────────────────────────
 const LoginPage = ({ onSuccess }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState(null);
-  const [message, setMessage] = useState("");
+  const [errors, setErrors]     = useState({});
+  const [status, setStatus]     = useState(null);
+  const [message, setMessage]   = useState("");
   const [attempts, setAttempts] = useState(0);
 
   const locked = attempts >= MAX_ATTEMPTS;
@@ -310,7 +307,7 @@ const LoginPage = ({ onSuccess }) => {
   }, [username, password, attempts, locked, validate, onSuccess]);
 
   const handleKeyDown = (e) => { if (e.key === "Enter") handleLogin(); };
-  const isLoading = status === "loading";
+  const isLoading  = status === "loading";
   const isDisabled = isLoading || locked || status === "success";
 
   return (
@@ -378,21 +375,62 @@ const LoginPage = ({ onSuccess }) => {
   );
 };
 
+// ── Dashboard ──────────────────────────────────────────────
 const Dashboard = () => {
-  const [tableRows, setTableRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [tableRows, setTableRows]   = useState([]);
+  const [stats, setStats]           = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [contactLoading, setContactLoading] = useState(true);
+  const [error, setError]           = useState(null);
 
+  // fetch project stats
+  useEffect(() => {
+    getStats()
+      .then((res) => setStats(res.data))
+      .catch((err) => setError(err))
+      .finally(() => setStatsLoading(false));
+  }, []);
+
+  // fetch contact messages
   useEffect(() => {
     GetContact()
       .then(setTableRows)
       .catch((err) => setError(err))
-      .finally(() => setLoading(false));
+      .finally(() => setContactLoading(false));
   }, []);
+
+  // ── Build metric cards from live stats ──────────────────
+  const metrics = statsLoading || !stats
+    ? [
+        { label: "Total Revenue",   value: "—",   badge: "loading", Icon: RevenueIcon        },
+        { label: "Active Projects", value: "—",   badge: "loading", Icon: ProjectsMetricIcon },
+        { label: "Pending Leads",   value: "—",   badge: "loading", Icon: LeadsIcon          },
+      ]
+    : [
+        {
+          label: "Total Revenue",
+          value: fmtCurrency(stats.totalRevenue),
+          badge: `${stats.total} project${stats.total !== 1 ? "s" : ""}`,
+          Icon: RevenueIcon,
+        },
+        {
+          label: "Active Projects",
+          value: String(stats.active),
+          badge: `${stats.done} done`,
+          Icon: ProjectsMetricIcon,
+        },
+        {
+          label: "Pending Leads",
+          value: String(stats.pendingLeads),
+          badge: `${stats.review} in review`,
+          Icon: LeadsIcon,
+        },
+      ];
 
   return (
     <>
       <h1 className="page-title">Performance Metrics</h1>
+
       <div className="metrics-grid">
         {metrics.map(({ label, value, badge, Icon }) => (
           <div className="metric-card" key={label}>
@@ -404,6 +442,7 @@ const Dashboard = () => {
         ))}
       </div>
 
+      {/* Contact messages table */}
       <div className="table-section">
         <div className="table-row header">
           <span className="table-cell">Name</span>
@@ -412,29 +451,28 @@ const Dashboard = () => {
           <span className="table-cell">Subject</span>
         </div>
 
-        {loading && (
+        {contactLoading && (
           <div className="table-row">
             <span className="table-cell" style={{ opacity: 0.5 }}>Loading…</span>
           </div>
         )}
-
         {error && (
           <div className="table-row">
-            <span className="table-cell" style={{ color: "#e53e3e" }}>Failed to load contacts.</span>
+            <span className="table-cell" style={{ color: "#e53e3e" }}>Failed to load data.</span>
           </div>
         )}
-
-        {!loading && !error && tableRows.length === 0 && (
+        {!contactLoading && !error && tableRows.length === 0 && (
           <div className="table-row">
             <span className="table-cell" style={{ opacity: 0.5 }}>No messages yet.</span>
           </div>
         )}
-
-        {!loading && !error && tableRows.map((row) => (
+        {!contactLoading && !error && tableRows.map((row) => (
           <div className="table-row" key={row._id}>
             <span className="table-cell">{row.name}</span>
             <span className="table-cell">{row.email}</span>
-            <span className="table-cell">{new Date(row.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+            <span className="table-cell">
+              {new Date(row.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+            </span>
             <span className="table-cell">{row.subject}</span>
           </div>
         ))}
