@@ -25,7 +25,7 @@ export const getAllProjects = async (req, res) => {
     }
 
     if (section) {
-      const allowed = ["web", "ai", "3d"];
+      const allowed = ["web", "ai", "embedded", "3d"];
       if (!allowed.includes(section)) {
         return sendError(res, `Invalid section. Must be one of: ${allowed.join(", ")}`);
       }
@@ -52,16 +52,27 @@ export const getAllProjects = async (req, res) => {
   }
 };
 
+// ─── GET /api/projects/stats ──────────────────────────────────────────────────
 
 export const getStats = async (req, res) => {
   try {
-    const [counts, avgProgress, revenueResult] = await Promise.all([
+    const [counts, avgProgress, revenueResult, addonCounts] = await Promise.all([
       // count by status
       Project.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
       // average progress
       Project.aggregate([{ $group: { _id: null, avg: { $avg: "$progress" } } }]),
       // total revenue
       Project.aggregate([{ $group: { _id: null, total: { $sum: "$price" } } }]),
+      // count projects that have each add-on active
+      Project.aggregate([
+        {
+          $group: {
+            _id: null,
+            withMobileAddon: { $sum: { $cond: ["$mobileAddon", 1, 0] } },
+            withWebAddon:    { $sum: { $cond: ["$webAddon",    1, 0] } },
+          },
+        },
+      ]),
     ]);
 
     const stats = { active: 0, review: 0, done: 0, total: 0 };
@@ -74,11 +85,12 @@ export const getStats = async (req, res) => {
       ? Math.round(avgProgress[0].avg)
       : 0;
 
-    // total revenue — sum of all project prices
-    stats.totalRevenue = revenueResult[0]?.total ?? 0;
+    stats.totalRevenue  = revenueResult[0]?.total ?? 0;
+    stats.pendingLeads  = stats.review;
 
-    // pending leads — projects still in "review"
-    stats.pendingLeads = stats.review;
+    // add-on counters (useful for the admin dashboard)
+    stats.withMobileAddon = addonCounts[0]?.withMobileAddon ?? 0;
+    stats.withWebAddon    = addonCounts[0]?.withWebAddon    ?? 0;
 
     sendSuccess(res, stats);
   } catch (error) {
@@ -104,8 +116,16 @@ export const getProjectById = async (req, res) => {
 
 export const createProject = async (req, res) => {
   try {
-    const { name, client, due, status, progress, price, mobileAddon, section } = req.body;
-    const project = await Project.create({ name, client, due, status, progress, price, mobileAddon, section });
+    const {
+      name, client, due, status, progress,
+      price, mobileAddon, webAddon, section,
+    } = req.body;
+
+    const project = await Project.create({
+      name, client, due, status, progress,
+      price, mobileAddon, webAddon, section,
+    });
+
     sendSuccess(res, project, 201);
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -120,12 +140,17 @@ export const createProject = async (req, res) => {
 
 export const updateProject = async (req, res) => {
   try {
-    const { name, client, due, status, progress, price, mobileAddon, section } = req.body;
+    const {
+      name, client, due, status, progress,
+      price, mobileAddon, webAddon, section,
+    } = req.body;
+
     const project = await Project.findByIdAndUpdate(
       req.params.id,
-      { name, client, due, status, progress, price, mobileAddon, section },
+      { name, client, due, status, progress, price, mobileAddon, webAddon, section },
       { new: true, runValidators: true }
     );
+
     if (!project) return sendError(res, "Project not found", 404);
     sendSuccess(res, project);
   } catch (error) {
@@ -143,7 +168,11 @@ export const updateProject = async (req, res) => {
 
 export const patchProject = async (req, res) => {
   try {
-    const allowed = ["name", "client", "due", "status", "progress", "price", "mobileAddon", "section"];
+    const allowed = [
+      "name", "client", "due", "status", "progress",
+      "price", "mobileAddon", "webAddon", "section",
+    ];
+
     const updates = {};
     allowed.forEach((field) => {
       if (req.body[field] !== undefined) updates[field] = req.body[field];
@@ -157,6 +186,7 @@ export const patchProject = async (req, res) => {
       { $set: updates },
       { new: true, runValidators: true }
     );
+
     if (!project) return sendError(res, "Project not found", 404);
     sendSuccess(res, project);
   } catch (error) {

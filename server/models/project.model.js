@@ -19,7 +19,13 @@ const projectSchema = new mongoose.Schema(
       required: [true, "Price is required"],
       min: [0, "Price cannot be less than 0"],
     },
+    // ─── Web plan add-on: include a mobile app ───────────
     mobileAddon: {
+      type: Boolean,
+      default: false,
+    },
+    // ─── AI plan add-on: include a web project ───────────
+    webAddon: {
       type: Boolean,
       default: false,
     },
@@ -27,8 +33,8 @@ const projectSchema = new mongoose.Schema(
     section: {
       type: String,
       enum: {
-        values: ["web", "ai", "3d"],
-        message: 'Section must be "web", "ai", or "3d"',
+        values: ["web", "ai", "embedded", "3d"],
+        message: 'Section must be "web", "ai", "embedded", or "3d"',
       },
       required: [true, "Section is required"],
     },

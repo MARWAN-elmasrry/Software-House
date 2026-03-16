@@ -25,7 +25,7 @@ const webPlans = [
             "Email Support",
         ],
         featuresActive: false,
-        section: "web",   // ← section tag
+        section: "web",
     },
     {
         name: "Medium",
@@ -82,7 +82,7 @@ const aiPlans = [
             "Email Support",
         ],
         featuresActive: false,
-        section: "ai",   // ← section tag
+        section: "ai",
     },
     {
         name: "AI Pro",
@@ -123,8 +123,8 @@ const aiPlans = [
 /* ─── Format price helper ───────────────────────────────── */
 const fmt = (n) => n.toLocaleString("en-US")
 
-/* ─── Plan Card ─────────────────────────────────────────── */
-const PlanCard = ({ plan, mobileChecked, onMobileToggle }) => {
+/* ─── Web Plan Card (with mobile add-on) ────────────────── */
+const WebPlanCard = ({ plan, mobileChecked, onMobileToggle }) => {
     const finalPrice = plan.basePrice + (mobileChecked ? 5000 : 0)
 
     const passedPlan = {
@@ -133,7 +133,7 @@ const PlanCard = ({ plan, mobileChecked, onMobileToggle }) => {
         icon:           plan.icon ?? null,
         basePrice:      plan.basePrice,
         mobileAddon:    mobileChecked,
-        section:        plan.section,       // ← pass section through to pay.jsx
+        section:        plan.section,
         features:       plan.features,
         featuresLabel:  plan.featuresLabel,
         featuresActive: plan.featuresActive,
@@ -152,12 +152,10 @@ const PlanCard = ({ plan, mobileChecked, onMobileToggle }) => {
 
             <div className="card-price">
                 {fmt(finalPrice)}
-                {mobileChecked && (
-                    <span className="price-addon"> +5,000</span>
-                )}
+                {mobileChecked && <span className="price-addon"> +5,000</span>}
             </div>
 
-            {/* Mobile App Add-on Checkbox */}
+            {/* Mobile App Add-on Checkbox — Web only */}
             <label className="mobile-addon">
                 <input
                     type="checkbox"
@@ -176,9 +174,7 @@ const PlanCard = ({ plan, mobileChecked, onMobileToggle }) => {
                 state={{ plan: passedPlan }}
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
-                <button className={`card-cta ${plan.ctaStyle}`}>
-                    {plan.cta}
-                </button>
+                <button className={`card-cta ${plan.ctaStyle}`}>{plan.cta}</button>
             </Link>
 
             <div className="features-label">{plan.featuresLabel}</div>
@@ -186,9 +182,75 @@ const PlanCard = ({ plan, mobileChecked, onMobileToggle }) => {
             <ul className="feature-list">
                 {plan.features.map((f) => (
                     <li key={f} className="feature-item">
-                        <span className={`check-icon ${plan.featuresActive ? "active" : "inactive"}`}>
-                            ✓
-                        </span>
+                        <span className={`check-icon ${plan.featuresActive ? "active" : "inactive"}`}>✓</span>
+                        {f}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    )
+}
+
+/* ─── AI Plan Card (with web project add-on) ────────────── */
+const AIPlanCard = ({ plan, webChecked, onWebToggle }) => {
+    const finalPrice = plan.basePrice + (webChecked ? 15000 : 0)
+
+    const passedPlan = {
+        name:           plan.name,
+        tagline:        plan.tagline,
+        icon:           plan.icon ?? null,
+        basePrice:      plan.basePrice,
+        webAddon:       webChecked,
+        section:        plan.section,
+        features:       plan.features,
+        featuresLabel:  plan.featuresLabel,
+        featuresActive: plan.featuresActive,
+    }
+
+    return (
+        <div className={`card${plan.recommended ? " recommended" : ""}`}>
+            {plan.recommended && <div className="rec-badge">RECOMMENDED</div>}
+
+            <div className="card-name">
+                {plan.name}
+                {plan.icon && <img src={plan.icon} alt={plan.name} className="icon" />}
+            </div>
+
+            <p className="card-tagline">{plan.tagline}</p>
+
+            <div className="card-price">
+                {fmt(finalPrice)}
+                {webChecked && <span className="price-addon"> +15,000</span>}
+            </div>
+
+            {/* Web Project Add-on Checkbox — AI only */}
+            <label className="mobile-addon">
+                <input
+                    type="checkbox"
+                    checked={webChecked}
+                    onChange={onWebToggle}
+                    className="mobile-checkbox"
+                />
+                <span className="mobile-addon-text">
+                    🌐 Add Web Project  <strong>+$15,000</strong>
+                </span>
+            </label>
+
+            <Link
+                style={{ textDecoration: "none" }}
+                to="/pay"
+                state={{ plan: passedPlan }}
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            >
+                <button className={`card-cta ${plan.ctaStyle}`}>{plan.cta}</button>
+            </Link>
+
+            <div className="features-label">{plan.featuresLabel}</div>
+
+            <ul className="feature-list">
+                {plan.features.map((f) => (
+                    <li key={f} className="feature-item">
+                        <span className={`check-icon ${plan.featuresActive ? "active" : "inactive"}`}>✓</span>
                         {f}
                     </li>
                 ))}
@@ -202,16 +264,20 @@ export const Package = ({ theme, toggleTheme }) => {
     const [webMobile, setWebMobile] = useState({
         Easy: false, Medium: false, Advanced: false,
     })
-    const [aiMobile, setAiMobile] = useState({
+
+    const [aiWeb, setAiWeb] = useState({
         "AI Starter": false, "AI Pro": false, "AI Enterprise": false,
     })
 
     const contactRef = useRef(null)
     const [formData, setFormData] = useState({ name: "", email: "", message: "" })
     const [formSent, setFormSent] = useState(false)
+    const [formType, setFormType] = useState("3d") // "3d" | "embedded"
 
-    const scrollToContact = () => {
-        contactRef.current?.scrollIntoView({ behavior: "smooth" })
+    const scrollToContact = (type = "3d") => {
+        setFormType(type)
+        // small delay so state updates before scroll
+        setTimeout(() => contactRef.current?.scrollIntoView({ behavior: "smooth" }), 50)
     }
 
     const handleFormSubmit = (e) => {
@@ -229,13 +295,14 @@ export const Package = ({ theme, toggleTheme }) => {
 
                         {/* ══ WEB SECTION ══ */}
                         <div className="pack-head">
+                            <span className="section-tag">WEB DEVELOPMENT</span>
                             <h1>Tailored Software Solutions <span>for Every Stage</span></h1>
                             <p>Choose the specialized tech service package that fits your business needs. Transparent pricing, no hidden fees.</p>
                         </div>
 
                         <div className="cards">
                             {webPlans.map((plan) => (
-                                <PlanCard
+                                <WebPlanCard
                                     key={plan.name}
                                     plan={plan}
                                     mobileChecked={webMobile[plan.name]}
@@ -257,15 +324,63 @@ export const Package = ({ theme, toggleTheme }) => {
 
                         <div className="cards">
                             {aiPlans.map((plan) => (
-                                <PlanCard
+                                <AIPlanCard
                                     key={plan.name}
                                     plan={plan}
-                                    mobileChecked={aiMobile[plan.name]}
-                                    onMobileToggle={() =>
-                                        setAiMobile((prev) => ({ ...prev, [plan.name]: !prev[plan.name] }))
+                                    webChecked={aiWeb[plan.name]}
+                                    onWebToggle={() =>
+                                        setAiWeb((prev) => ({ ...prev, [plan.name]: !prev[plan.name] }))
                                     }
                                 />
                             ))}
+                        </div>
+
+                        {/* ══ EMBEDDED SYSTEMS SECTION ══ */}
+                        <div className="pack-section-divider">
+                            <div className="section-label embedded-label">
+                                <span className="section-tag embedded-tag">EMBEDDED SYSTEMS</span>
+                                <h2>Hardware Meets Software <span>Built to Perform</span></h2>
+                                <p>Every embedded project has unique constraints. Pricing depends on hardware scope, protocols, and certifications. Let's engineer it together.</p>
+                            </div>
+                        </div>
+
+                        <div className="threed-section">
+                            <div className="threed-card embedded-card">
+                                <div className="threed-orb threed-orb-1 embedded-orb-1" />
+                                <div className="threed-orb threed-orb-2 embedded-orb-2" />
+                                <div className="threed-orb threed-orb-3 embedded-orb-3" />
+
+                                <div className="threed-content">
+                                    <div className="threed-badge embedded-badge">CUSTOM PRICING</div>
+                                    <h3 className="threed-title">Embedded Systems Development</h3>
+                                    <p className="threed-desc">
+                                        From bare-metal firmware to full IoT platforms — we design, prototype, and deploy embedded systems built for reliability, performance, and the real world.
+                                    </p>
+
+                                    <ul className="threed-features">
+                                        {[
+                                            "Microcontroller & RTOS Programming",
+                                            "PCB Design & Prototyping",
+                                            "IoT Connectivity (MQTT / BLE / LoRa)",
+                                            "Custom FPGA / ASIC Solutions",
+                                            "Safety & Certification Support",
+                                            "Hardware-Software Co-design",
+                                        ].map((f) => (
+                                            <li key={f}>
+                                                <span className="threed-check embedded-check">⬡</span> {f}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <div className="threed-price-note">
+                                        Price varies based on hardware scope &amp; complexity
+                                    </div>
+
+                                    <button className="threed-cta embedded-cta" onClick={() => scrollToContact("embedded")}>
+                                        Book a Free Call
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         {/* ══ 3D SECTION ══ */}
@@ -309,8 +424,7 @@ export const Package = ({ theme, toggleTheme }) => {
                                         Price varies based on scope &amp; complexity
                                     </div>
 
-                                    {/* 3D uses the contact form — section will be set to "3d" there */}
-                                    <button className="threed-cta" onClick={scrollToContact}>
+                                    <button className="threed-cta" onClick={() => scrollToContact("3d")}>
                                         Book a Free Call
                                     </button>
                                 </div>
@@ -321,7 +435,12 @@ export const Package = ({ theme, toggleTheme }) => {
                         <div className="contact-section" ref={contactRef}>
                             <div className="contact-head">
                                 <span className="section-tag">GET IN TOUCH</span>
-                                <h2>Tell Us About <span>Your 3D Project</span></h2>
+                                <h2>
+                                    Tell Us About{" "}
+                                    <span>
+                                        {formType === "embedded" ? "Your Embedded Project" : "Your 3D Project"}
+                                    </span>
+                                </h2>
                                 <p>Share your idea and we'll get back to you with a custom quote within 24 hours.</p>
                             </div>
 
@@ -358,7 +477,11 @@ export const Package = ({ theme, toggleTheme }) => {
                                     <div className="form-group">
                                         <label>Tell us about your project</label>
                                         <textarea
-                                            placeholder="Describe your 3D project, goals, timeline, and any references..."
+                                            placeholder={
+                                                formType === "embedded"
+                                                    ? "Describe your embedded system, hardware requirements, protocols, and timeline..."
+                                                    : "Describe your 3D project, goals, timeline, and any references..."
+                                            }
                                             rows={5}
                                             value={formData.message}
                                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}

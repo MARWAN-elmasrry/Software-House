@@ -7,7 +7,7 @@ import {
 } from "../../api/service/projectServ";
 
 const STATUS_LABELS  = { active: "Active", review: "In Review", done: "Done" };
-const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", "3d": "🎲 3D" };
+const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", embedded: "🔌 Embedded", "3d": "🎲 3D" };
 
 const PlusIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -16,9 +16,61 @@ const PlusIcon = () => (
   </svg>
 );
 
-const emptyForm = { name: "", client: "", due: "", status: "active", progress: 0, price: "", mobileAddon: false, section: "web" };
+const emptyForm = {
+  name: "", client: "", due: "", status: "active", progress: 0,
+  price: "", mobileAddon: false, webAddon: false, section: "web",
+};
 
-// ─── Add Modal — full fields ──────────────────────────────
+// ─── Add-on fields per section ────────────────────────────
+const renderAddonField = (form, onChange) => {
+  if (form.section === "web") {
+    return (
+      <label className="ab-field">
+        <span>Mobile Add-on</span>
+        <select
+          value={form.mobileAddon ? "true" : "false"}
+          onChange={(e) => onChange("mobileAddon", e.target.value === "true")}
+        >
+          <option value="false">No</option>
+          <option value="true">Yes (+$5,000)</option>
+        </select>
+      </label>
+    );
+  }
+  if (form.section === "ai") {
+    return (
+      <label className="ab-field">
+        <span>Web Project Add-on</span>
+        <select
+          value={form.webAddon ? "true" : "false"}
+          onChange={(e) => onChange("webAddon", e.target.value === "true")}
+        >
+          <option value="false">No</option>
+          <option value="true">Yes (+$15,000)</option>
+        </select>
+      </label>
+    );
+  }
+  return null; // embedded & 3d have no add-ons
+};
+
+// ─── Add-on display helper (table cell) ──────────────────
+const renderAddonCell = (p) => {
+  if (p.section === "web"  && p.mobileAddon) return "📱 Mobile";
+  if (p.section === "ai"   && p.webAddon)    return "🌐 Web";
+  return "—";
+};
+
+// ─── Add-on display helper (edit modal readonly) ─────────
+const renderAddonReadonly = (form) => {
+  if (form.section === "web" && form.mobileAddon)
+    return <span style={{ marginLeft: 8, fontSize: 13, opacity: 0.7 }}>📱 +Mobile</span>;
+  if (form.section === "ai" && form.webAddon)
+    return <span style={{ marginLeft: 8, fontSize: 13, opacity: 0.7 }}>🌐 +Web</span>;
+  return null;
+};
+
+// ─── Add Modal ────────────────────────────────────────────
 const AddModal = ({ form, onChange, onSave, onClose }) => (
   <div className="ab-overlay" onClick={onClose}>
     <div className="ab-modal" onClick={(e) => e.stopPropagation()}>
@@ -29,9 +81,18 @@ const AddModal = ({ form, onChange, onSave, onClose }) => (
       <div className="ab-modal__body">
         <label className="ab-field">
           <span>Section</span>
-          <select value={form.section} onChange={(e) => onChange("section", e.target.value)}>
+          <select
+            value={form.section}
+            onChange={(e) => {
+              // reset both addons when switching section
+              onChange("section", e.target.value);
+              onChange("mobileAddon", false);
+              onChange("webAddon", false);
+            }}
+          >
             <option value="web">🌐 Web</option>
             <option value="ai">🤖 AI</option>
+            <option value="embedded">🔌 Embedded</option>
             <option value="3d">🎲 3D</option>
           </select>
         </label>
@@ -57,13 +118,10 @@ const AddModal = ({ form, onChange, onSave, onClose }) => (
             placeholder="e.g. 15000"
           />
         </label>
-        <label className="ab-field">
-          <span>Mobile Add-on</span>
-          <select value={form.mobileAddon ? "true" : "false"} onChange={(e) => onChange("mobileAddon", e.target.value === "true")}>
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-          </select>
-        </label>
+
+        {/* Conditional add-on field */}
+        {renderAddonField(form, onChange)}
+
         <label className="ab-field">
           <span>Status</span>
           <select value={form.status} onChange={(e) => onChange("status", e.target.value)}>
@@ -74,7 +132,10 @@ const AddModal = ({ form, onChange, onSave, onClose }) => (
         </label>
         <label className="ab-field">
           <span>Progress ({form.progress}%)</span>
-          <input type="range" min="0" max="100" value={form.progress} onChange={(e) => onChange("progress", Number(e.target.value))} />
+          <input
+            type="range" min="0" max="100" value={form.progress}
+            onChange={(e) => onChange("progress", Number(e.target.value))}
+          />
         </label>
       </div>
       <div className="ab-modal__footer">
@@ -85,7 +146,7 @@ const AddModal = ({ form, onChange, onSave, onClose }) => (
   </div>
 );
 
-// ─── Edit Modal — status & progress ONLY ─────────────────
+// ─── Edit Modal — status & progress only ─────────────────
 const EditModal = ({ form, onChange, onSave, onClose }) => (
   <div className="ab-overlay" onClick={onClose}>
     <div className="ab-modal" onClick={(e) => e.stopPropagation()}>
@@ -114,7 +175,7 @@ const EditModal = ({ form, onChange, onSave, onClose }) => (
           <span>Price</span>
           <p>
             {form.price != null ? `$${Number(form.price).toLocaleString("en-US")}` : "—"}
-            {form.mobileAddon && <span style={{ marginLeft: 8, fontSize: 13, opacity: 0.7 }}>📱 +Mobile</span>}
+            {renderAddonReadonly(form)}
           </p>
         </div>
         <label className="ab-field">
@@ -127,7 +188,10 @@ const EditModal = ({ form, onChange, onSave, onClose }) => (
         </label>
         <label className="ab-field">
           <span>Progress ({form.progress}%)</span>
-          <input type="range" min="0" max="100" value={form.progress} onChange={(e) => onChange("progress", Number(e.target.value))} />
+          <input
+            type="range" min="0" max="100" value={form.progress}
+            onChange={(e) => onChange("progress", Number(e.target.value))}
+          />
         </label>
       </div>
       <div className="ab-modal__footer">
@@ -138,16 +202,15 @@ const EditModal = ({ form, onChange, onSave, onClose }) => (
   </div>
 );
 
+// ─── Main Component ───────────────────────────────────────
 export const AdminProjects = () => {
-  const [projects, setProjects]   = useState([]);
-  const [modal, setModal]         = useState(null);
-  const [form, setForm]           = useState(emptyForm);
-  const [editId, setEditId]       = useState(null);
-  const [deleteId, setDeleteId]   = useState(null);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState(null);
-
-  // ─── Active section tab: "all" | "web" | "ai" | "3d" ────
+  const [projects, setProjects] = useState([]);
+  const [modal, setModal]       = useState(null);
+  const [form, setForm]         = useState(emptyForm);
+  const [editId, setEditId]     = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
   const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
@@ -165,7 +228,6 @@ export const AdminProjects = () => {
     fetchProjects();
   }, []);
 
-  // ─── Filter projects by active tab ───────────────────────
   const visibleProjects = activeTab === "all"
     ? projects
     : projects.filter((p) => p.section === activeTab);
@@ -181,7 +243,8 @@ export const AdminProjects = () => {
       due:         p.due,
       price:       p.price ?? "",
       mobileAddon: p.mobileAddon ?? false,
-      section:     p.section ?? "web",
+      webAddon:    p.webAddon    ?? false,
+      section:     p.section    ?? "web",
       status:      p.status,
       progress:    p.progress,
     });
@@ -236,13 +299,14 @@ export const AdminProjects = () => {
         </button>
       </div>
 
-      {/* ── Section Tabs ── */}
+      {/* Section Tabs */}
       <div className="ap-tabs">
         {[
-          { key: "all", label: "All" },
-          { key: "web", label: "🌐 Web" },
-          { key: "ai",  label: "🤖 AI" },
-          { key: "3d",  label: "🎲 3D" },
+          { key: "all",      label: "All" },
+          { key: "web",      label: "🌐 Web" },
+          { key: "ai",       label: "🤖 AI" },
+          { key: "embedded", label: "🔌 Embedded" },
+          { key: "3d",       label: "🎲 3D" },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -251,7 +315,9 @@ export const AdminProjects = () => {
           >
             {tab.label}
             <span className="ap-tab__count">
-              {tab.key === "all" ? projects.length : projects.filter((p) => p.section === tab.key).length}
+              {tab.key === "all"
+                ? projects.length
+                : projects.filter((p) => p.section === tab.key).length}
             </span>
           </button>
         ))}
@@ -265,7 +331,7 @@ export const AdminProjects = () => {
           <span>Due</span>
           <span>Section</span>
           <span>Price</span>
-          <span>Mobile</span>
+          <span>Add-on</span>
           <span>Status</span>
           <span>Progress</span>
           <span></span>
@@ -277,7 +343,6 @@ export const AdminProjects = () => {
             <span className="ap-table__client">{p.client}</span>
             <span className="ap-table__due">{p.due}</span>
 
-            {/* ─── Section badge ── */}
             <span className={`ap-section-badge ap-section-badge--${p.section}`}>
               {SECTION_LABELS[p.section] ?? p.section}
             </span>
@@ -286,8 +351,9 @@ export const AdminProjects = () => {
               {p.price != null ? `$${Number(p.price).toLocaleString("en-US")}` : "—"}
             </span>
 
+            {/* Unified add-on column */}
             <span className="ap-table__mobile">
-              {p.mobileAddon ? "📱 Yes" : "—"}
+              {renderAddonCell(p)}
             </span>
 
             <span className={`ap-badge ap-badge--${p.status}`}>{STATUS_LABELS[p.status]}</span>

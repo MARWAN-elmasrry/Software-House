@@ -123,7 +123,16 @@ const getTodayFormatted = () =>
     new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
 /* ─── Section label helper ───────────────────────────────── */
-const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", "3d": "🎲 3D" };
+const SECTION_LABELS = {
+    web:      "🌐 Web",
+    ai:       "🤖 AI",
+    embedded: "🔌 Embedded",
+    "3d":     "🎲 3D",
+};
+
+/* ─── Add-on prices ──────────────────────────────────────── */
+const MOBILE_ADDON_PRICE = 5000;
+const WEB_ADDON_PRICE    = 15000;
 
 /* ─── Component ─────────────────────────────────────────── */
 
@@ -143,7 +152,8 @@ export const Payment = ({ theme, toggleTheme }) => {
         icon:        null,
         basePrice:   15000,
         mobileAddon: false,
-        section:     "web",   // ← default fallback
+        webAddon:    false,
+        section:     "web",
         features: [
             "Basic UI/UX Design",
             "Frontend implementation",
@@ -153,12 +163,14 @@ export const Payment = ({ theme, toggleTheme }) => {
     };
 
     // ── Price calculations ─────────────────────────────────
-    const subtotal    = selectedPlan.basePrice;
-    const mobileAddon = selectedPlan.mobileAddon ? 5000 : 0;
-    const taxRate     = 0.09;
-    const taxes       = Math.round((subtotal + mobileAddon) * taxRate);
-    const service     = 0;
-    const total       = subtotal + mobileAddon + taxes + service;
+    const subtotal      = selectedPlan.basePrice;
+    const mobileAddon   = selectedPlan.mobileAddon ? MOBILE_ADDON_PRICE : 0;
+    const webAddon      = selectedPlan.webAddon    ? WEB_ADDON_PRICE    : 0;
+    const addonsTotal   = mobileAddon + webAddon;
+    const taxRate       = 0.09;
+    const taxes         = Math.round((subtotal + addonsTotal) * taxRate);
+    const service       = 0;
+    const total         = subtotal + addonsTotal + taxes + service;
 
     // ── Confirm & Pay ──────────────────────────────────────
     const handleConfirm = async () => {
@@ -176,7 +188,8 @@ export const Payment = ({ theme, toggleTheme }) => {
                 client:      clientName.trim(),
                 price:       total,
                 mobileAddon: selectedPlan.mobileAddon ?? false,
-                section:     selectedPlan.section ?? "web",   // ← send section
+                webAddon:    selectedPlan.webAddon    ?? false,
+                section:     selectedPlan.section     ?? "web",
                 due:         getTodayFormatted(),
                 status:      "review",
                 progress:    0,
@@ -268,7 +281,7 @@ export const Payment = ({ theme, toggleTheme }) => {
                             <h2 className="pay-summary-title">Order Summary</h2>
 
                             {/* ── Section badge ── */}
-                            <div className="pay-section-badge">
+                            <div className={`pay-section-badge pay-section-badge--${selectedPlan.section}`}>
                                 {SECTION_LABELS[selectedPlan.section] ?? selectedPlan.section}
                             </div>
 
@@ -284,7 +297,7 @@ export const Payment = ({ theme, toggleTheme }) => {
                                 <span className="pay-plan-price">{formatPrice(subtotal)}</span>
                             </div>
 
-                            {/* ── Mobile Add-on row ── */}
+                            {/* ── Mobile Add-on row (Web plans) ── */}
                             {selectedPlan.mobileAddon && (
                                 <div className="pay-plan-row">
                                     <div className="pay-plan-icon">
@@ -295,12 +308,23 @@ export const Payment = ({ theme, toggleTheme }) => {
                                 </div>
                             )}
 
+                            {/* ── Web Add-on row (AI plans) ── */}
+                            {selectedPlan.webAddon && (
+                                <div className="pay-plan-row">
+                                    <div className="pay-plan-icon">
+                                        <span style={{ fontSize: 22 }}>🌐</span>
+                                    </div>
+                                    <span className="pay-plan-name">Web Project Add-on</span>
+                                    <span className="pay-plan-price">{formatPrice(webAddon)}</span>
+                                </div>
+                            )}
+
                             <div className="pay-summary-divider" />
 
                             {/* ── Totals ── */}
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Subtotal</span>
-                                <span className="pay-summary-value">{formatPrice(subtotal + mobileAddon)}</span>
+                                <span className="pay-summary-value">{formatPrice(subtotal + addonsTotal)}</span>
                             </div>
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Taxes (Estimated 9%)</span>
