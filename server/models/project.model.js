@@ -14,6 +14,11 @@ const projectSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, "Client name cannot exceed 100 characters"],
     },
+      price: {
+    type: Number,
+    required: [true, "Price is required"],
+    min: [0, "Price cannot be less than 0"],
+   },
     due: {
       type: String,
       required: [true, "Due date is required"],
@@ -40,7 +45,6 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-// Auto-set status to "done" if progress hits 100
 projectSchema.pre("save", function (next) {
   if (this.progress === 100) {
     this.status = "done";

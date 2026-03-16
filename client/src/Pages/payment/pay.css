@@ -113,6 +113,11 @@
                     outline: none;
                     font-size: 2rem;
                     width: 100%;
+                    color: var(--text-color);
+
+                    &::placeholder {
+                        opacity: 0.4;
+                    }
                 }
             }
 
@@ -179,7 +184,6 @@
                 margin-bottom: 40px;
 
                 .pay-summary-label {
-                    color: var;
                     font-weight: 600;
                     font-size: 2rem;
                 }
@@ -206,6 +210,55 @@
                 }
             }
 
+            /* ── Project Details ── */
+            .pay-project-section {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 4px;
+
+                .pay-project-label {
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    opacity: 0.45;
+                    margin: 0;
+                }
+
+                .pay-input-wrap {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    background-color: var(--background-color);
+                    border: 1px solid color-mix(in srgb, var(--active-link) 30%, #2e2e2e);
+                    border-radius: 8px;
+                    padding: 12px 14px;
+                    margin-bottom: 0;
+                    width: 100%;
+                    box-sizing: border-box;
+                    transition: border-color 0.2s, box-shadow 0.2s;
+
+                    &:focus-within {
+                        border-color: var(--active-link);
+                        box-shadow: 0 0 0 3px color-mix(in srgb, var(--active-link) 12%, transparent);
+                    }
+
+                    .pay-input {
+                        background: none;
+                        border: none;
+                        outline: none;
+                        font-size: 1.6rem;
+                        width: 100%;
+                        color: var(--text-color);
+
+                        &::placeholder {
+                            opacity: 0.4;
+                        }
+                    }
+                }
+            }
+
             .pay-confirm-btn {
                 display: flex;
                 align-items: center;
@@ -222,7 +275,7 @@
                 cursor: pointer;
                 margin-top: 20px;
                 box-sizing: border-box;
-                transition: background-color 0.2s;
+                transition: background-color 0.2s, color 0.2s;
 
                 &:hover {
                     color: #2a2a2a;
@@ -332,6 +385,10 @@
                     font-size: 2rem;
                 }
 
+                .pay-project-section .pay-input-wrap .pay-input {
+                    font-size: 1.4rem;
+                }
+
                 .pay-ssl {
                     font-size: 1.2rem;
                 }
@@ -371,6 +428,10 @@
 
                 .pay-total-value {
                     font-size: 1.8rem;
+                }
+
+                .pay-project-section .pay-input-wrap .pay-input {
+                    font-size: 1.3rem;
                 }
             }
         }

@@ -85,8 +85,8 @@ export const getProjectById = async (req, res) => {
 
 export const createProject = async (req, res) => {
   try {
-    const { name, client, due, status, progress } = req.body;
-    const project = await Project.create({ name, client, due, status, progress });
+    const { name, client, due, status, progress, price } = req.body;
+    const project = await Project.create({ name, client, due, status, progress, price });
     sendSuccess(res, project, 201);
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -101,10 +101,10 @@ export const createProject = async (req, res) => {
 
 export const updateProject = async (req, res) => {
   try {
-    const { name, client, due, status, progress } = req.body;
+    const { name, client, due, status, progress, price } = req.body;
     const project = await Project.findByIdAndUpdate(
       req.params.id,
-      { name, client, due, status, progress },
+      { name, client, due, status, progress, price },
       { new: true, runValidators: true }
     );
     if (!project) return sendError(res, "Project not found", 404);
@@ -124,7 +124,7 @@ export const updateProject = async (req, res) => {
 
 export const patchProject = async (req, res) => {
   try {
-    const allowed = ["name", "client", "due", "status", "progress"];
+    const allowed = ["name", "client", "due", "status", "progress", "price"];
     const updates = {};
     allowed.forEach((field) => {
       if (req.body[field] !== undefined) updates[field] = req.body[field];

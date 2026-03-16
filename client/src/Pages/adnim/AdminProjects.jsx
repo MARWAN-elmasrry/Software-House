@@ -15,8 +15,10 @@ const PlusIcon = () => (
   </svg>
 );
 
-const emptyForm = { name: "", client: "", due: "", status: "active", progress: 0 };
+// ─── emptyForm includes price ─────────────────────────────
+const emptyForm = { name: "", client: "", due: "", status: "active", progress: 0, price: "" };
 
+// ─── Modal includes price field ───────────────────────────
 const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
   <div className="ab-overlay" onClick={onClose}>
     <div className="ab-modal" onClick={(e) => e.stopPropagation()}>
@@ -36,6 +38,16 @@ const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
         <label className="ab-field">
           <span>Due Date</span>
           <input value={form.due} onChange={(e) => onChange("due", e.target.value)} placeholder="e.g. Apr 15, 2026" />
+        </label>
+        <label className="ab-field">
+          <span>Price ($)</span>
+          <input
+            type="number"
+            min="0"
+            value={form.price}
+            onChange={(e) => onChange("price", Number(e.target.value))}
+            placeholder="e.g. 15000"
+          />
         </label>
         <label className="ab-field">
           <span>Status</span>
@@ -86,8 +98,22 @@ export const AdminProjects = () => {
   const handleField = (key, val) => setForm((f) => ({ ...f, [key]: val }));
 
   const openAdd  = () => { setForm(emptyForm); setModal("add"); };
-  const openEdit = (p) => { setForm({ name: p.name, client: p.client, due: p.due, status: p.status, progress: p.progress }); setEditId(p._id); setModal("edit"); };
-  const close    = () => { setModal(null); setEditId(null); };
+
+  // ─── openEdit pre-fills price ─────────────────────────────────────────────
+  const openEdit = (p) => {
+    setForm({
+      name:     p.name,
+      client:   p.client,
+      due:      p.due,
+      status:   p.status,
+      progress: p.progress,
+      price:    p.price ?? "",
+    });
+    setEditId(p._id);
+    setModal("edit");
+  };
+
+  const close = () => { setModal(null); setEditId(null); };
 
   // ─── Create / Update ──────────────────────────────────────────────────────
   const handleSave = async () => {
@@ -142,6 +168,7 @@ export const AdminProjects = () => {
           <span>Name</span>
           <span>Client</span>
           <span>Due</span>
+          <span>Price</span>
           <span>Status</span>
           <span>Progress</span>
           <span></span>
@@ -152,6 +179,12 @@ export const AdminProjects = () => {
             <span className="ap-table__name">{p.name}</span>
             <span className="ap-table__client">{p.client}</span>
             <span className="ap-table__due">{p.due}</span>
+
+            {/* ─── Price column ── */}
+            <span className="ap-table__price">
+              {p.price != null ? `$${Number(p.price).toLocaleString("en-US")}` : "—"}
+            </span>
+
             <span className={`ap-badge ap-badge--${p.status}`}>{STATUS_LABELS[p.status]}</span>
             <div className="ap-progress">
               <div className="ap-progress__bar">

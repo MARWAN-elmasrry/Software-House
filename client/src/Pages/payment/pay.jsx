@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Footer } from "../../components/footer/footer";
 import { Header } from "../../components/header/header";
-import Dashsd  from "../../assets/dashesd.png"
+import Dashsd from "../../assets/dashesd.png";
+import { createProject } from "../../api/service/projectServ";
 import "./pay.css";
 
 /* ─── SVG Icons ─────────────────────────────────────────── */
@@ -98,11 +100,86 @@ const ArrowRightIcon = ({ size = 30, color = "currentColor" }) => (
     </svg>
 );
 
+const FolderIcon = ({ size = 20, color = "currentColor" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+    </svg>
+);
+
+const BadgeIcon = ({ size = 20, color = "currentColor" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="6" />
+        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+    </svg>
+);
+
+/* ─── Price helpers ──────────────────────────────────────── */
+const parsePrice = (raw) => parseFloat(String(raw).replace(/[$,\s]/g, "")) || 0;
+const formatPrice = (num) => "$" + num.toLocaleString("en-US", { minimumFractionDigits: 0 });
+
+/* ─── Get today's date as "MMM DD, YYYY" ────────────────── */
+const getTodayFormatted = () =>
+    new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
 /* ─── Component ─────────────────────────────────────────── */
 
 export const Payment = ({ theme, toggleTheme }) => {
     const [activeMethod, setActiveMethod] = useState("credit");
-    var ActiveLink = "var(--active-link)"
+    const [projectName, setProjectName]   = useState("");
+    const [clientName, setClientName]     = useState("");
+    const [submitting, setSubmitting]     = useState(false);
+    const [submitError, setSubmitError]   = useState(null);
+    const [submitted, setSubmitted]       = useState(false);
+
+    const { state } = useLocation();
+    const ActiveLink = "var(--active-link)";
+
+    const selectedPlan = state?.plan ?? {
+        name: "Easy",
+        icon: null,
+        price: "15,000",
+        features: [
+            "Basic UI/UX Design",
+            "Frontend implementation",
+            "Weekly updates",
+            "Email Support",
+        ],
+    };
+
+    const subtotal = parsePrice(selectedPlan.price);
+    const taxRate  = 0.09;
+    const taxes    = Math.round(subtotal * taxRate);
+    const service  = 0;
+    const total    = subtotal + taxes + service;
+
+    // ── Confirm & Pay ────────────────────────────────────────
+    const handleConfirm = async () => {
+        if (!projectName.trim() || !clientName.trim()) {
+            setSubmitError("Please fill in both Project Name and Client Name.");
+            return;
+        }
+
+        setSubmitError(null);
+        setSubmitting(true);
+
+        try {
+            await createProject({
+                name:     projectName.trim(),
+                client:   clientName.trim(),
+                price:    total,                  // total including taxes
+                due:      getTodayFormatted(),     // set to today; update as needed
+                status:   "review",               // always "review" on first submission
+                progress: 0,
+            });
+            setSubmitted(true);
+        } catch (err) {
+            setSubmitError(typeof err === "string" ? err : "Something went wrong. Please try again.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     return (
         <div data-theme={theme}>
@@ -182,23 +259,28 @@ export const Payment = ({ theme, toggleTheme }) => {
                         <div className="pay-summary">
                             <h2 className="pay-summary-title">Order Summary</h2>
 
+                            {/* ── Dynamic plan row ── */}
                             <div className="pay-plan-row">
                                 <div className="pay-plan-icon">
-                                    <LeafIcon size={30} color={ActiveLink}  />
+                                    {selectedPlan.icon
+                                        ? <img src={selectedPlan.icon} alt={selectedPlan.name} style={{ width: 30, height: 30 }} />
+                                        : <LeafIcon size={30} color={ActiveLink} />
+                                    }
                                 </div>
-                                <span className="pay-plan-name">Easy</span>
-                                <span className="pay-plan-price">$999</span>
+                                <span className="pay-plan-name">{selectedPlan.name}</span>
+                                <span className="pay-plan-price">{formatPrice(subtotal)}</span>
                             </div>
 
                             <div className="pay-summary-divider" />
 
+                            {/* ── Dynamic totals ── */}
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Subtotal</span>
-                                <span className="pay-summary-value">$999</span>
+                                <span className="pay-summary-value">{formatPrice(subtotal)}</span>
                             </div>
                             <div className="pay-summary-row">
-                                <span className="pay-summary-label">Taxes (Estimated)</span>
-                                <span className="pay-summary-value">$90</span>
+                                <span className="pay-summary-label">Taxes (Estimated 9%)</span>
+                                <span className="pay-summary-value">{formatPrice(taxes)}</span>
                             </div>
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Service Fee</span>
@@ -209,11 +291,57 @@ export const Payment = ({ theme, toggleTheme }) => {
 
                             <div className="pay-total-row">
                                 <span className="pay-total-label">Total Due</span>
-                                <span className="pay-total-value">$1,089</span>
+                                <span className="pay-total-value">{formatPrice(total)}</span>
                             </div>
 
-                            <button className="pay-confirm-btn">
-                                Confirm and Pay <ArrowRightIcon size={30} color="#111" />
+                            <div className="pay-summary-divider" />
+
+                            {/* ── Project & Client fields ── */}
+                            <div className="pay-project-section">
+                                <p className="pay-project-label">Project Details</p>
+
+                                <div className="pay-input-wrap">
+                                    <FolderIcon size={20} color={ActiveLink} />
+                                    <input
+                                        className="pay-input"
+                                        placeholder="Project Name"
+                                        value={projectName}
+                                        onChange={(e) => { setProjectName(e.target.value); setSubmitError(null); }}
+                                    />
+                                </div>
+
+                                <div className="pay-input-wrap">
+                                    <BadgeIcon size={20} color={ActiveLink} />
+                                    <input
+                                        className="pay-input"
+                                        placeholder="Client Name"
+                                        value={clientName}
+                                        onChange={(e) => { setClientName(e.target.value); setSubmitError(null); }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* ── Error message ── */}
+                            {submitError && (
+                                <p className="pay-error">{submitError}</p>
+                            )}
+
+                            {/* ── Success message ── */}
+                            {submitted && (
+                                <p className="pay-success">✓ Project created successfully!</p>
+                            )}
+
+                            <button
+                                className="pay-confirm-btn"
+                                onClick={handleConfirm}
+                                disabled={submitting || submitted}
+                            >
+                                {submitting
+                                    ? "Processing..."
+                                    : submitted
+                                    ? "Payment Confirmed ✓"
+                                    : <>Confirm and Pay <ArrowRightIcon size={30} color="#111" /></>
+                                }
                             </button>
 
                             <div className="pay-ssl">
