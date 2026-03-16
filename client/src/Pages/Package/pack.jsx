@@ -25,6 +25,7 @@ const webPlans = [
             "Email Support",
         ],
         featuresActive: false,
+        section: "web",   // ← section tag
     },
     {
         name: "Medium",
@@ -42,6 +43,7 @@ const webPlans = [
             "Priority Slack Support",
         ],
         featuresActive: true,
+        section: "web",
     },
     {
         name: "Advanced",
@@ -59,6 +61,7 @@ const webPlans = [
             "Quarterly Security Audits",
         ],
         featuresActive: false,
+        section: "web",
     },
 ]
 
@@ -79,6 +82,7 @@ const aiPlans = [
             "Email Support",
         ],
         featuresActive: false,
+        section: "ai",   // ← section tag
     },
     {
         name: "AI Pro",
@@ -95,6 +99,7 @@ const aiPlans = [
             "Priority Slack Support",
         ],
         featuresActive: true,
+        section: "ai",
     },
     {
         name: "AI Enterprise",
@@ -111,6 +116,7 @@ const aiPlans = [
             "Quarterly AI Strategy Call",
         ],
         featuresActive: false,
+        section: "ai",
     },
 ]
 
@@ -120,10 +126,17 @@ const fmt = (n) => n.toLocaleString("en-US")
 /* ─── Plan Card ─────────────────────────────────────────── */
 const PlanCard = ({ plan, mobileChecked, onMobileToggle }) => {
     const finalPrice = plan.basePrice + (mobileChecked ? 5000 : 0)
+
     const passedPlan = {
-        ...plan,
-        price: String(finalPrice),
-        icon: plan.icon ?? null,
+        name:           plan.name,
+        tagline:        plan.tagline,
+        icon:           plan.icon ?? null,
+        basePrice:      plan.basePrice,
+        mobileAddon:    mobileChecked,
+        section:        plan.section,       // ← pass section through to pay.jsx
+        features:       plan.features,
+        featuresLabel:  plan.featuresLabel,
+        featuresActive: plan.featuresActive,
     }
 
     return (
@@ -186,7 +199,6 @@ const PlanCard = ({ plan, mobileChecked, onMobileToggle }) => {
 
 /* ─── Main Component ────────────────────────────────────── */
 export const Package = ({ theme, toggleTheme }) => {
-    // Mobile add-on state: separate for web and ai, keyed by plan name
     const [webMobile, setWebMobile] = useState({
         Easy: false, Medium: false, Advanced: false,
     })
@@ -194,7 +206,6 @@ export const Package = ({ theme, toggleTheme }) => {
         "AI Starter": false, "AI Pro": false, "AI Enterprise": false,
     })
 
-    // Contact form state
     const contactRef = useRef(null)
     const [formData, setFormData] = useState({ name: "", email: "", message: "" })
     const [formSent, setFormSent] = useState(false)
@@ -298,6 +309,7 @@ export const Package = ({ theme, toggleTheme }) => {
                                         Price varies based on scope &amp; complexity
                                     </div>
 
+                                    {/* 3D uses the contact form — section will be set to "3d" there */}
                                     <button className="threed-cta" onClick={scrollToContact}>
                                         Book a Free Call
                                     </button>

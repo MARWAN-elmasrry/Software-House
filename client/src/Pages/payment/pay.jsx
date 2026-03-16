@@ -116,12 +116,14 @@ const BadgeIcon = ({ size = 20, color = "currentColor" }) => (
 );
 
 /* ─── Price helpers ──────────────────────────────────────── */
-const parsePrice = (raw) => parseFloat(String(raw).replace(/[$,\s]/g, "")) || 0;
 const formatPrice = (num) => "$" + num.toLocaleString("en-US", { minimumFractionDigits: 0 });
 
 /* ─── Get today's date as "MMM DD, YYYY" ────────────────── */
 const getTodayFormatted = () =>
     new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+/* ─── Section label helper ───────────────────────────────── */
+const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", "3d": "🎲 3D" };
 
 /* ─── Component ─────────────────────────────────────────── */
 
@@ -137,9 +139,11 @@ export const Payment = ({ theme, toggleTheme }) => {
     const ActiveLink = "var(--active-link)";
 
     const selectedPlan = state?.plan ?? {
-        name: "Easy",
-        icon: null,
-        price: "15,000",
+        name:        "Easy",
+        icon:        null,
+        basePrice:   15000,
+        mobileAddon: false,
+        section:     "web",   // ← default fallback
         features: [
             "Basic UI/UX Design",
             "Frontend implementation",
@@ -148,13 +152,15 @@ export const Payment = ({ theme, toggleTheme }) => {
         ],
     };
 
-    const subtotal = parsePrice(selectedPlan.price);
-    const taxRate  = 0.09;
-    const taxes    = Math.round(subtotal * taxRate);
-    const service  = 0;
-    const total    = subtotal + taxes + service;
+    // ── Price calculations ─────────────────────────────────
+    const subtotal    = selectedPlan.basePrice;
+    const mobileAddon = selectedPlan.mobileAddon ? 5000 : 0;
+    const taxRate     = 0.09;
+    const taxes       = Math.round((subtotal + mobileAddon) * taxRate);
+    const service     = 0;
+    const total       = subtotal + mobileAddon + taxes + service;
 
-    // ── Confirm & Pay ────────────────────────────────────────
+    // ── Confirm & Pay ──────────────────────────────────────
     const handleConfirm = async () => {
         if (!projectName.trim() || !clientName.trim()) {
             setSubmitError("Please fill in both Project Name and Client Name.");
@@ -166,12 +172,14 @@ export const Payment = ({ theme, toggleTheme }) => {
 
         try {
             await createProject({
-                name:     projectName.trim(),
-                client:   clientName.trim(),
-                price:    total,                  // total including taxes
-                due:      getTodayFormatted(),     // set to today; update as needed
-                status:   "review",               // always "review" on first submission
-                progress: 0,
+                name:        projectName.trim(),
+                client:      clientName.trim(),
+                price:       total,
+                mobileAddon: selectedPlan.mobileAddon ?? false,
+                section:     selectedPlan.section ?? "web",   // ← send section
+                due:         getTodayFormatted(),
+                status:      "review",
+                progress:    0,
             });
             setSubmitted(true);
         } catch (err) {
@@ -259,7 +267,12 @@ export const Payment = ({ theme, toggleTheme }) => {
                         <div className="pay-summary">
                             <h2 className="pay-summary-title">Order Summary</h2>
 
-                            {/* ── Dynamic plan row ── */}
+                            {/* ── Section badge ── */}
+                            <div className="pay-section-badge">
+                                {SECTION_LABELS[selectedPlan.section] ?? selectedPlan.section}
+                            </div>
+
+                            {/* ── Plan row ── */}
                             <div className="pay-plan-row">
                                 <div className="pay-plan-icon">
                                     {selectedPlan.icon
@@ -271,12 +284,23 @@ export const Payment = ({ theme, toggleTheme }) => {
                                 <span className="pay-plan-price">{formatPrice(subtotal)}</span>
                             </div>
 
+                            {/* ── Mobile Add-on row ── */}
+                            {selectedPlan.mobileAddon && (
+                                <div className="pay-plan-row">
+                                    <div className="pay-plan-icon">
+                                        <span style={{ fontSize: 22 }}>📱</span>
+                                    </div>
+                                    <span className="pay-plan-name">Mobile App Add-on</span>
+                                    <span className="pay-plan-price">{formatPrice(mobileAddon)}</span>
+                                </div>
+                            )}
+
                             <div className="pay-summary-divider" />
 
-                            {/* ── Dynamic totals ── */}
+                            {/* ── Totals ── */}
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Subtotal</span>
-                                <span className="pay-summary-value">{formatPrice(subtotal)}</span>
+                                <span className="pay-summary-value">{formatPrice(subtotal + mobileAddon)}</span>
                             </div>
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Taxes (Estimated 9%)</span>
@@ -321,15 +345,8 @@ export const Payment = ({ theme, toggleTheme }) => {
                                 </div>
                             </div>
 
-                            {/* ── Error message ── */}
-                            {submitError && (
-                                <p className="pay-error">{submitError}</p>
-                            )}
-
-                            {/* ── Success message ── */}
-                            {submitted && (
-                                <p className="pay-success">✓ Project created successfully!</p>
-                            )}
+                            {submitError && <p className="pay-error">{submitError}</p>}
+                            {submitted   && <p className="pay-success">✓ Project created successfully!</p>}
 
                             <button
                                 className="pay-confirm-btn"

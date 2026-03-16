@@ -14,11 +14,24 @@ const projectSchema = new mongoose.Schema(
       trim: true,
       maxlength: [100, "Client name cannot exceed 100 characters"],
     },
-      price: {
-    type: Number,
-    required: [true, "Price is required"],
-    min: [0, "Price cannot be less than 0"],
-   },
+    price: {
+      type: Number,
+      required: [true, "Price is required"],
+      min: [0, "Price cannot be less than 0"],
+    },
+    mobileAddon: {
+      type: Boolean,
+      default: false,
+    },
+    // ─── which service section this project belongs to ───
+    section: {
+      type: String,
+      enum: {
+        values: ["web", "ai", "3d"],
+        message: 'Section must be "web", "ai", or "3d"',
+      },
+      required: [true, "Section is required"],
+    },
     due: {
       type: String,
       required: [true, "Due date is required"],

@@ -6,7 +6,8 @@ import {
   deleteProject,
 } from "../../api/service/projectServ";
 
-const STATUS_LABELS = { active: "Active", review: "In Review", done: "Done" };
+const STATUS_LABELS  = { active: "Active", review: "In Review", done: "Done" };
+const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", "3d": "🎲 3D" };
 
 const PlusIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -15,18 +16,25 @@ const PlusIcon = () => (
   </svg>
 );
 
-// ─── emptyForm includes price ─────────────────────────────
-const emptyForm = { name: "", client: "", due: "", status: "active", progress: 0, price: "" };
+const emptyForm = { name: "", client: "", due: "", status: "active", progress: 0, price: "", mobileAddon: false, section: "web" };
 
-// ─── Modal includes price field ───────────────────────────
-const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
+// ─── Add Modal — full fields ──────────────────────────────
+const AddModal = ({ form, onChange, onSave, onClose }) => (
   <div className="ab-overlay" onClick={onClose}>
     <div className="ab-modal" onClick={(e) => e.stopPropagation()}>
       <div className="ab-modal__header">
-        <h2 className="ab-modal__title">{isEdit ? "Edit Project" : "New Project"}</h2>
+        <h2 className="ab-modal__title">New Project</h2>
         <button className="ab-modal__close" onClick={onClose}>✕</button>
       </div>
       <div className="ab-modal__body">
+        <label className="ab-field">
+          <span>Section</span>
+          <select value={form.section} onChange={(e) => onChange("section", e.target.value)}>
+            <option value="web">🌐 Web</option>
+            <option value="ai">🤖 AI</option>
+            <option value="3d">🎲 3D</option>
+          </select>
+        </label>
         <label className="ab-field">
           <span>Project Name</span>
           <input value={form.name} onChange={(e) => onChange("name", e.target.value)} placeholder="Project name" />
@@ -50,6 +58,13 @@ const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
           />
         </label>
         <label className="ab-field">
+          <span>Mobile Add-on</span>
+          <select value={form.mobileAddon ? "true" : "false"} onChange={(e) => onChange("mobileAddon", e.target.value === "true")}>
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+          </select>
+        </label>
+        <label className="ab-field">
           <span>Status</span>
           <select value={form.status} onChange={(e) => onChange("status", e.target.value)}>
             <option value="active">Active</option>
@@ -64,22 +79,77 @@ const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
       </div>
       <div className="ab-modal__footer">
         <button className="ab-btn ab-btn--ghost" onClick={onClose}>Cancel</button>
-        <button className="ab-btn ab-btn--primary" onClick={onSave}>{isEdit ? "Save Changes" : "Add Project"}</button>
+        <button className="ab-btn ab-btn--primary" onClick={onSave}>Add Project</button>
+      </div>
+    </div>
+  </div>
+);
+
+// ─── Edit Modal — status & progress ONLY ─────────────────
+const EditModal = ({ form, onChange, onSave, onClose }) => (
+  <div className="ab-overlay" onClick={onClose}>
+    <div className="ab-modal" onClick={(e) => e.stopPropagation()}>
+      <div className="ab-modal__header">
+        <h2 className="ab-modal__title">Edit Project</h2>
+        <button className="ab-modal__close" onClick={onClose}>✕</button>
+      </div>
+      <div className="ab-modal__body">
+        <div className="ab-field ab-field--readonly">
+          <span>Section</span>
+          <p>{SECTION_LABELS[form.section] ?? form.section}</p>
+        </div>
+        <div className="ab-field ab-field--readonly">
+          <span>Project Name</span>
+          <p>{form.name}</p>
+        </div>
+        <div className="ab-field ab-field--readonly">
+          <span>Client</span>
+          <p>{form.client}</p>
+        </div>
+        <div className="ab-field ab-field--readonly">
+          <span>Due Date</span>
+          <p>{form.due}</p>
+        </div>
+        <div className="ab-field ab-field--readonly">
+          <span>Price</span>
+          <p>
+            {form.price != null ? `$${Number(form.price).toLocaleString("en-US")}` : "—"}
+            {form.mobileAddon && <span style={{ marginLeft: 8, fontSize: 13, opacity: 0.7 }}>📱 +Mobile</span>}
+          </p>
+        </div>
+        <label className="ab-field">
+          <span>Status</span>
+          <select value={form.status} onChange={(e) => onChange("status", e.target.value)}>
+            <option value="active">Active</option>
+            <option value="review">In Review</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+        <label className="ab-field">
+          <span>Progress ({form.progress}%)</span>
+          <input type="range" min="0" max="100" value={form.progress} onChange={(e) => onChange("progress", Number(e.target.value))} />
+        </label>
+      </div>
+      <div className="ab-modal__footer">
+        <button className="ab-btn ab-btn--ghost" onClick={onClose}>Cancel</button>
+        <button className="ab-btn ab-btn--primary" onClick={onSave}>Save Changes</button>
       </div>
     </div>
   </div>
 );
 
 export const AdminProjects = () => {
-  const [projects, setProjects] = useState([]);
-  const [modal, setModal]       = useState(null);
-  const [form, setForm]         = useState(emptyForm);
-  const [editId, setEditId]     = useState(null);
-  const [deleteId, setDeleteId] = useState(null);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
+  const [projects, setProjects]   = useState([]);
+  const [modal, setModal]         = useState(null);
+  const [form, setForm]           = useState(emptyForm);
+  const [editId, setEditId]       = useState(null);
+  const [deleteId, setDeleteId]   = useState(null);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState(null);
 
-  // ─── Fetch all projects on mount ──────────────────────────────────────────
+  // ─── Active section tab: "all" | "web" | "ai" | "3d" ────
+  const [activeTab, setActiveTab] = useState("all");
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -95,19 +165,25 @@ export const AdminProjects = () => {
     fetchProjects();
   }, []);
 
+  // ─── Filter projects by active tab ───────────────────────
+  const visibleProjects = activeTab === "all"
+    ? projects
+    : projects.filter((p) => p.section === activeTab);
+
   const handleField = (key, val) => setForm((f) => ({ ...f, [key]: val }));
 
-  const openAdd  = () => { setForm(emptyForm); setModal("add"); };
+  const openAdd = () => { setForm(emptyForm); setModal("add"); };
 
-  // ─── openEdit pre-fills price ─────────────────────────────────────────────
   const openEdit = (p) => {
     setForm({
-      name:     p.name,
-      client:   p.client,
-      due:      p.due,
-      status:   p.status,
-      progress: p.progress,
-      price:    p.price ?? "",
+      name:        p.name,
+      client:      p.client,
+      due:         p.due,
+      price:       p.price ?? "",
+      mobileAddon: p.mobileAddon ?? false,
+      section:     p.section ?? "web",
+      status:      p.status,
+      progress:    p.progress,
     });
     setEditId(p._id);
     setModal("edit");
@@ -115,15 +191,14 @@ export const AdminProjects = () => {
 
   const close = () => { setModal(null); setEditId(null); };
 
-  // ─── Create / Update ──────────────────────────────────────────────────────
   const handleSave = async () => {
-    if (!form.name.trim()) return;
+    if (modal === "add" && !form.name.trim()) return;
     try {
       if (modal === "add") {
         const res = await createProject(form);
         setProjects((prev) => [...prev, res.data]);
       } else {
-        const res = await updateProject(editId, form);
+        const res = await updateProject(editId, { status: form.status, progress: form.progress });
         setProjects((prev) => prev.map((p) => p._id === editId ? res.data : p));
       }
       close();
@@ -132,7 +207,6 @@ export const AdminProjects = () => {
     }
   };
 
-  // ─── Delete ───────────────────────────────────────────────────────────────
   const handleDelete = async (id) => {
     try {
       await deleteProject(id);
@@ -143,12 +217,12 @@ export const AdminProjects = () => {
     }
   };
 
-  // ─── UI States ────────────────────────────────────────────────────────────
   if (loading) return <div className="ab"><p style={{ padding: "2rem" }}>Loading projects...</p></div>;
-  if (error)   return <div className="ab"><p style={{ padding: "2rem", color: "red" }}>Error: {error}</p></div>;
+  if (error)   return <div className="ab"><p style={{ padding: "2rem", color: "red" }}>Error: {String(error)}</p></div>;
 
   return (
     <div className="ab">
+
       {/* Topbar */}
       <div className="ab__topbar">
         <div>
@@ -162,36 +236,69 @@ export const AdminProjects = () => {
         </button>
       </div>
 
+      {/* ── Section Tabs ── */}
+      <div className="ap-tabs">
+        {[
+          { key: "all", label: "All" },
+          { key: "web", label: "🌐 Web" },
+          { key: "ai",  label: "🤖 AI" },
+          { key: "3d",  label: "🎲 3D" },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            className={`ap-tab ${activeTab === tab.key ? "ap-tab--active" : ""}`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            {tab.label}
+            <span className="ap-tab__count">
+              {tab.key === "all" ? projects.length : projects.filter((p) => p.section === tab.key).length}
+            </span>
+          </button>
+        ))}
+      </div>
+
       {/* Table */}
       <div className="ap-table">
         <div className="ap-table__head">
           <span>Name</span>
           <span>Client</span>
           <span>Due</span>
+          <span>Section</span>
           <span>Price</span>
+          <span>Mobile</span>
           <span>Status</span>
           <span>Progress</span>
           <span></span>
         </div>
 
-        {projects.map((p) => (
+        {visibleProjects.map((p) => (
           <div className="ap-table__row" key={p._id}>
             <span className="ap-table__name">{p.name}</span>
             <span className="ap-table__client">{p.client}</span>
             <span className="ap-table__due">{p.due}</span>
 
-            {/* ─── Price column ── */}
+            {/* ─── Section badge ── */}
+            <span className={`ap-section-badge ap-section-badge--${p.section}`}>
+              {SECTION_LABELS[p.section] ?? p.section}
+            </span>
+
             <span className="ap-table__price">
               {p.price != null ? `$${Number(p.price).toLocaleString("en-US")}` : "—"}
             </span>
 
+            <span className="ap-table__mobile">
+              {p.mobileAddon ? "📱 Yes" : "—"}
+            </span>
+
             <span className={`ap-badge ap-badge--${p.status}`}>{STATUS_LABELS[p.status]}</span>
+
             <div className="ap-progress">
               <div className="ap-progress__bar">
                 <div className="ap-progress__fill" style={{ width: `${p.progress}%` }} />
               </div>
               <span className="ap-progress__label">{p.progress}%</span>
             </div>
+
             <div className="ap-table__actions">
               <button className="ab-icon-btn" onClick={() => openEdit(p)} title="Edit">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -211,9 +318,9 @@ export const AdminProjects = () => {
           </div>
         ))}
 
-        {projects.length === 0 && (
+        {visibleProjects.length === 0 && (
           <div className="ab__empty">
-            <p>No projects yet.</p>
+            <p>No {activeTab === "all" ? "" : SECTION_LABELS[activeTab]} projects yet.</p>
             <button className="ab-btn ab-btn--primary" onClick={openAdd}>
               <PlusIcon /> Add your first project
             </button>
@@ -221,18 +328,9 @@ export const AdminProjects = () => {
         )}
       </div>
 
-      {/* Add / Edit Modal */}
-      {modal && (
-        <Modal
-          form={form}
-          onChange={handleField}
-          onSave={handleSave}
-          onClose={close}
-          isEdit={modal === "edit"}
-        />
-      )}
+      {modal === "add"  && <AddModal  form={form} onChange={handleField} onSave={handleSave} onClose={close} />}
+      {modal === "edit" && <EditModal form={form} onChange={handleField} onSave={handleSave} onClose={close} />}
 
-      {/* Delete Confirm Modal */}
       {deleteId && (
         <div className="ab-overlay" onClick={() => setDeleteId(null)}>
           <div className="ab-modal ab-modal--sm" onClick={(e) => e.stopPropagation()}>

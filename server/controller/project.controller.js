@@ -12,15 +12,25 @@ const sendError = (res, message, statusCode = 400) =>
 
 export const getAllProjects = async (req, res) => {
   try {
-    const { status, page = 1, limit = 20, sort = "-createdAt" } = req.query;
+    const { status, section, page = 1, limit = 20, sort = "-createdAt" } = req.query;
 
     const filter = {};
+
     if (status) {
       const allowed = ["active", "review", "done"];
       if (!allowed.includes(status)) {
         return sendError(res, `Invalid status. Must be one of: ${allowed.join(", ")}`);
       }
       filter.status = status;
+    }
+
+    // ─── filter by section (web / ai / 3d) ───────────────
+    if (section) {
+      const allowed = ["web", "ai", "3d"];
+      if (!allowed.includes(section)) {
+        return sendError(res, `Invalid section. Must be one of: ${allowed.join(", ")}`);
+      }
+      filter.section = section;
     }
 
     const skip = (Number(page) - 1) * Number(limit);
@@ -85,8 +95,8 @@ export const getProjectById = async (req, res) => {
 
 export const createProject = async (req, res) => {
   try {
-    const { name, client, due, status, progress, price } = req.body;
-    const project = await Project.create({ name, client, due, status, progress, price });
+    const { name, client, due, status, progress, price, mobileAddon, section } = req.body;
+    const project = await Project.create({ name, client, due, status, progress, price, mobileAddon, section });
     sendSuccess(res, project, 201);
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -101,10 +111,10 @@ export const createProject = async (req, res) => {
 
 export const updateProject = async (req, res) => {
   try {
-    const { name, client, due, status, progress, price } = req.body;
+    const { name, client, due, status, progress, price, mobileAddon, section } = req.body;
     const project = await Project.findByIdAndUpdate(
       req.params.id,
-      { name, client, due, status, progress, price },
+      { name, client, due, status, progress, price, mobileAddon, section },
       { new: true, runValidators: true }
     );
     if (!project) return sendError(res, "Project not found", 404);
@@ -124,7 +134,7 @@ export const updateProject = async (req, res) => {
 
 export const patchProject = async (req, res) => {
   try {
-    const allowed = ["name", "client", "due", "status", "progress", "price"];
+    const allowed = ["name", "client", "due", "status", "progress", "price", "mobileAddon", "section"];
     const updates = {};
     allowed.forEach((field) => {
       if (req.body[field] !== undefined) updates[field] = req.body[field];
