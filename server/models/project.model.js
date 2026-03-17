@@ -19,30 +19,28 @@ const projectSchema = new mongoose.Schema(
       required: [true, "Price is required"],
       min: [0, "Price cannot be less than 0"],
     },
-    // ─── Web plan add-on: include a mobile app ───────────
-    mobileAddon: {
-      type: Boolean,
-      default: false,
-    },
-    // ─── AI plan add-on: include a web project ───────────
-    webAddon: {
-      type: Boolean,
-      default: false,
-    },
-    // ─── which service section this project belongs to ───
+
+    // ─── Add-ons ──────────────────────────────────────────
+    mobileAddon: { type: Boolean, default: false },
+    webAddon:    { type: Boolean, default: false },
+    aiAddon:     { type: Boolean, default: false },
+
+    // ─── Section ──────────────────────────────────────────
     section: {
       type: String,
       enum: {
-        values: ["web", "ai", "embedded", "3d"],
-        message: 'Section must be "web", "ai", "embedded", or "3d"',
+        values: ["web", "ai", "mobile", "embedded", "3d"],
+        message: 'Section must be "web", "ai", "mobile", "embedded", or "3d"',
       },
       required: [true, "Section is required"],
     },
+
     due: {
       type: String,
       required: [true, "Due date is required"],
       trim: true,
     },
+
     status: {
       type: String,
       enum: {
@@ -51,10 +49,35 @@ const projectSchema = new mongoose.Schema(
       },
       default: "active",
     },
+
     progress: {
       type: Number,
       min: [0, "Progress cannot be less than 0"],
       max: [100, "Progress cannot exceed 100"],
+      default: 0,
+    },
+
+    // ─── Vodafone Cash payment info ───────────────────────
+    senderName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    whatsappNumber: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    paymentScreenshot: {
+      type: String,   // base64 data URL or file path
+      default: "",
+    },
+    depositPaid: {
+      type: Boolean,
+      default: false,
+    },
+    depositAmount: {
+      type: Number,
       default: 0,
     },
   },
@@ -65,17 +88,13 @@ const projectSchema = new mongoose.Schema(
 );
 
 projectSchema.pre("save", function (next) {
-  if (this.progress === 100) {
-    this.status = "done";
-  }
+  if (this.progress === 100) this.status = "done";
   next();
 });
 
 projectSchema.pre("findOneAndUpdate", function (next) {
   const update = this.getUpdate();
-  if (update.progress === 100) {
-    update.status = "done";
-  }
+  if (update.progress === 100) update.status = "done";
   next();
 });
 

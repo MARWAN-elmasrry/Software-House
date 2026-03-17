@@ -1,7 +1,5 @@
 import Project from "../models/project.model.js";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 const sendSuccess = (res, data, statusCode = 200) =>
   res.status(statusCode).json({ success: true, data });
 
@@ -13,27 +11,23 @@ const sendError = (res, message, statusCode = 400) =>
 export const getAllProjects = async (req, res) => {
   try {
     const { status, section, page = 1, limit = 20, sort = "-createdAt" } = req.query;
-
     const filter = {};
 
     if (status) {
       const allowed = ["active", "review", "done"];
-      if (!allowed.includes(status)) {
+      if (!allowed.includes(status))
         return sendError(res, `Invalid status. Must be one of: ${allowed.join(", ")}`);
-      }
       filter.status = status;
     }
 
     if (section) {
-      const allowed = ["web", "ai", "embedded", "3d"];
-      if (!allowed.includes(section)) {
+      const allowed = ["web", "ai", "mobile", "embedded", "3d"];
+      if (!allowed.includes(section))
         return sendError(res, `Invalid section. Must be one of: ${allowed.join(", ")}`);
-      }
       filter.section = section;
     }
 
     const skip = (Number(page) - 1) * Number(limit);
-
     const [projects, total] = await Promise.all([
       Project.find(filter).sort(sort).skip(skip).limit(Number(limit)),
       Project.countDocuments(filter),
@@ -56,41 +50,54 @@ export const getAllProjects = async (req, res) => {
 
 export const getStats = async (req, res) => {
   try {
-    const [counts, avgProgress, revenueResult, addonCounts] = await Promise.all([
-      // count by status
-      Project.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
-      // average progress
-      Project.aggregate([{ $group: { _id: null, avg: { $avg: "$progress" } } }]),
-      // total revenue
-      Project.aggregate([{ $group: { _id: null, total: { $sum: "$price" } } }]),
-      // count projects that have each add-on active
-      Project.aggregate([
-        {
-          $group: {
-            _id: null,
-            withMobileAddon: { $sum: { $cond: ["$mobileAddon", 1, 0] } },
-            withWebAddon:    { $sum: { $cond: ["$webAddon",    1, 0] } },
+    const [counts, avgProgress, revenueResult, addonCounts, sectionCounts, depositCounts] =
+      await Promise.all([
+        Project.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+        Project.aggregate([{ $group: { _id: null, avg: { $avg: "$progress" } } }]),
+        Project.aggregate([{ $group: { _id: null, total: { $sum: "$price" }, deposits: { $sum: "$depositAmount" } } }]),
+        Project.aggregate([
+          {
+            $group: {
+              _id: null,
+              withMobileAddon: { $sum: { $cond: ["$mobileAddon", 1, 0] } },
+              withWebAddon:    { $sum: { $cond: ["$webAddon",    1, 0] } },
+              withAiAddon:     { $sum: { $cond: ["$aiAddon",     1, 0] } },
+            },
           },
-        },
-      ]),
-    ]);
+        ]),
+        Project.aggregate([{ $group: { _id: "$section", count: { $sum: 1 } } }]),
+        Project.aggregate([
+          {
+            $group: {
+              _id: null,
+              depositPaid:   { $sum: { $cond: ["$depositPaid",   1, 0] } },
+              depositPending:{ $sum: { $cond: ["$depositPaid",   0, 1] } },
+              totalDeposits: { $sum: "$depositAmount" },
+            },
+          },
+        ]),
+      ]);
 
     const stats = { active: 0, review: 0, done: 0, total: 0 };
-    counts.forEach(({ _id, count }) => {
-      stats[_id] = count;
-      stats.total += count;
-    });
+    counts.forEach(({ _id, count }) => { stats[_id] = count; stats.total += count; });
 
-    stats.averageProgress = avgProgress[0]?.avg
-      ? Math.round(avgProgress[0].avg)
-      : 0;
+    stats.averageProgress = avgProgress[0]?.avg ? Math.round(avgProgress[0].avg) : 0;
+    stats.totalRevenue    = revenueResult[0]?.total    ?? 0;
+    stats.totalDeposits   = revenueResult[0]?.deposits ?? 0;
+    stats.pendingLeads    = stats.review;
 
-    stats.totalRevenue  = revenueResult[0]?.total ?? 0;
-    stats.pendingLeads  = stats.review;
-
-    // add-on counters (useful for the admin dashboard)
     stats.withMobileAddon = addonCounts[0]?.withMobileAddon ?? 0;
     stats.withWebAddon    = addonCounts[0]?.withWebAddon    ?? 0;
+    stats.withAiAddon     = addonCounts[0]?.withAiAddon     ?? 0;
+
+    stats.bySection = { web: 0, ai: 0, mobile: 0, embedded: 0, "3d": 0 };
+    sectionCounts.forEach(({ _id, count }) => {
+      if (_id in stats.bySection) stats.bySection[_id] = count;
+    });
+
+    stats.depositPaid    = depositCounts[0]?.depositPaid    ?? 0;
+    stats.depositPending = depositCounts[0]?.depositPending ?? 0;
+    stats.totalDepositsCollected = depositCounts[0]?.totalDeposits ?? 0;
 
     sendSuccess(res, stats);
   } catch (error) {
@@ -106,8 +113,7 @@ export const getProjectById = async (req, res) => {
     if (!project) return sendError(res, "Project not found", 404);
     sendSuccess(res, project);
   } catch (error) {
-    if (error.name === "CastError")
-      return sendError(res, "Invalid project ID format", 400);
+    if (error.name === "CastError") return sendError(res, "Invalid project ID format", 400);
     sendError(res, error.message, 500);
   }
 };
@@ -118,12 +124,19 @@ export const createProject = async (req, res) => {
   try {
     const {
       name, client, due, status, progress,
-      price, mobileAddon, webAddon, section,
+      price, mobileAddon, webAddon, aiAddon, section,
+      senderName, whatsappNumber, paymentScreenshot,
+      depositPaid, depositAmount,
     } = req.body;
 
     const project = await Project.create({
       name, client, due, status, progress,
-      price, mobileAddon, webAddon, section,
+      price, mobileAddon, webAddon, aiAddon, section,
+      senderName:        senderName        ?? "",
+      whatsappNumber:    whatsappNumber    ?? "",
+      paymentScreenshot: paymentScreenshot ?? "",
+      depositPaid:       depositPaid       ?? false,
+      depositAmount:     depositAmount     ?? 0,
     });
 
     sendSuccess(res, project, 201);
@@ -142,20 +155,26 @@ export const updateProject = async (req, res) => {
   try {
     const {
       name, client, due, status, progress,
-      price, mobileAddon, webAddon, section,
+      price, mobileAddon, webAddon, aiAddon, section,
+      senderName, whatsappNumber, paymentScreenshot,
+      depositPaid, depositAmount,
     } = req.body;
 
     const project = await Project.findByIdAndUpdate(
       req.params.id,
-      { name, client, due, status, progress, price, mobileAddon, webAddon, section },
+      {
+        name, client, due, status, progress,
+        price, mobileAddon, webAddon, aiAddon, section,
+        senderName, whatsappNumber, paymentScreenshot,
+        depositPaid, depositAmount,
+      },
       { new: true, runValidators: true }
     );
 
     if (!project) return sendError(res, "Project not found", 404);
     sendSuccess(res, project);
   } catch (error) {
-    if (error.name === "CastError")
-      return sendError(res, "Invalid project ID format", 400);
+    if (error.name === "CastError") return sendError(res, "Invalid project ID format", 400);
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((e) => e.message);
       return sendError(res, messages.join(". "), 422);
@@ -170,7 +189,9 @@ export const patchProject = async (req, res) => {
   try {
     const allowed = [
       "name", "client", "due", "status", "progress",
-      "price", "mobileAddon", "webAddon", "section",
+      "price", "mobileAddon", "webAddon", "aiAddon", "section",
+      "senderName", "whatsappNumber", "paymentScreenshot",
+      "depositPaid", "depositAmount",
     ];
 
     const updates = {};
@@ -190,8 +211,7 @@ export const patchProject = async (req, res) => {
     if (!project) return sendError(res, "Project not found", 404);
     sendSuccess(res, project);
   } catch (error) {
-    if (error.name === "CastError")
-      return sendError(res, "Invalid project ID format", 400);
+    if (error.name === "CastError") return sendError(res, "Invalid project ID format", 400);
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((e) => e.message);
       return sendError(res, messages.join(". "), 422);
@@ -208,8 +228,7 @@ export const deleteProject = async (req, res) => {
     if (!project) return sendError(res, "Project not found", 404);
     sendSuccess(res, { message: "Project deleted successfully", id: req.params.id });
   } catch (error) {
-    if (error.name === "CastError")
-      return sendError(res, "Invalid project ID format", 400);
+    if (error.name === "CastError") return sendError(res, "Invalid project ID format", 400);
     sendError(res, error.message, 500);
   }
 };

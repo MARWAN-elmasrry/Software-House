@@ -4,9 +4,10 @@ import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import contactRoutes from "./routes/contact.route.js";
 import projectRoutes from "./routes/project.route.js";
-import blogRoutes from "./routes/blog.route.js";
+import blogRoutes    from "./routes/blog.route.js";
+import adminRoutes   from "./routes/admin.route.js";   // ← new
 
-dotenv.config(); 
+dotenv.config();
 
 const app = express();
 
@@ -16,16 +17,15 @@ connectDB().then().catch(err => {
 });
 
 app.use(cors());
-app.use(express.json()); 
+app.use(express.json());
 
-app.use("/api/contact", contactRoutes);
+app.use("/api/contact",  contactRoutes);
 app.use("/api/projects", projectRoutes);
-app.use("/api/blogs", blogRoutes);
+app.use("/api/blogs",    blogRoutes);
+app.use("/api/admin",    adminRoutes);   // ← new
 
-
-
-const PORT = process.env.PORT || 5000;
-const BASE_URL = `http://localhost:${PORT}`; 
+const PORT    = process.env.PORT || 5000;
+const BASE_URL = `http://localhost:${PORT}`;
 
 app.listen(PORT, () => {
   console.log(`Server running on ${BASE_URL}`);

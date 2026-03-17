@@ -1,5 +1,4 @@
 import './why.css'
-import Cloud from "../../assets/cloud.png"
 import Brain from "../../assets/brain.png"
 import Code from "../../assets/mobile.png"
 import Chip from "../../assets/sys.png"
@@ -19,16 +18,6 @@ export const WhyUs = () => {
                     <div className="cards">
                         <div className="card">
                             <div className="card-icon">
-                                <img src={Cloud} alt="Cloud" />
-                            </div>
-                            <div className="h2">
-                                <h2>Scalable Cloud Solutions</h2>
-                            </div>  
-                            <p>We build secure, high-performance cloud architectures that scale effortlessly as your business grows.</p>
-                        </div>
-                        
-                        <div className="card">
-                            <div className="card-icon">
                                 <img src={Brain} alt="AI Brain" />
                             </div>
                             <div className="h2">
@@ -42,7 +31,7 @@ export const WhyUs = () => {
                                 <img src={Code} alt="Code" />
                             </div>
                             <div className="h2">
-                                <h2>Modern App Development</h2>
+                                <h2>Modern App and web Development</h2>
                             </div>
                             <p>We create fast, responsive web and mobile applications with clean code and exceptional user experience.</p>
                         </div>
@@ -62,7 +51,7 @@ export const WhyUs = () => {
                                 <img src={Design} alt="Design" />
                             </div>
                             <div className="h2">
-                                <h2>User-Centered Design</h2>
+                                <h2>3D Design</h2>
                             </div>
                             <p>We craft intuitive interfaces and seamless experiences that users love and businesses trust.</p>
                         </div>

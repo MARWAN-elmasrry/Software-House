@@ -12,9 +12,9 @@ export const Word =()=>{
                             <span>‘’</span>
                         </div>
                         <div className="info">
-                            <p><span>"</span>Technology is only as good as the problem it solves. We don't just write code; we engineer outcomes that drive business forward <span>"</span></p>
+                            <p><span>"</span> Technology is only as good as the problem it solves. We don't just write code; we engineer outcomes that drive business forward <span>"</span></p>
                             <div className="line"></div>
-                            <h3>Name</h3>
+                            <h3>Mohamed Desoky</h3>
                             <span>Founder & Ceo</span>
                         </div>
                     </div>

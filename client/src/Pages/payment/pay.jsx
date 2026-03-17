@@ -6,193 +6,116 @@ import Dashsd from "../../assets/dashesd.png";
 import { createProject } from "../../api/service/projectServ";
 import "./pay.css";
 
-/* ─── SVG Icons ─────────────────────────────────────────── */
+const ShieldIcon     = ({ size = 30, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>);
+const ArrowRightIcon = ({ size = 30, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>);
+const LeafIcon       = ({ size = 30, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></svg>);
+const FolderIcon     = ({ size = 20, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>);
+const BadgeIcon      = ({ size = 20, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6" /><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" /></svg>);
+const UserIcon       = ({ size = 20, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>);
+const PhoneIcon      = ({ size = 20, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.08 6.08l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z" /></svg>);
+const UploadIcon     = ({ size = 24, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>);
+const InfoIcon       = ({ size = 18, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>);
 
-const CreditCardIcon = ({ size = 30, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
-        <line x1="1" y1="10" x2="23" y2="10" />
-    </svg>
-);
+const formatPrice       = (num) => "$" + num.toLocaleString("en-US", { minimumFractionDigits: 0 });
+const getTodayFormatted = () => new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-const PayPalIcon = ({ size = 30 }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path
-            fill="#009cde"
-            d="M6.5 21.5H3.3a.8.8 0 0 1-.8-.92L5.42 3.1A.8.8 0 0 1 6.2 2.5h7.1
-               c2.1 0 3.64.5 4.57 1.49.88.93 1.18 2.1.93 3.65l-.01.07
-               C18.1 10.8 15.9 12.5 12.6 12.5h-2.1a.8.8 0 0 0-.79.68
-               l-.95 6.04-.26 1.63a.4.4 0 0 1-.4.34H6.5z"
-        />
-        <path
-            fill="#012169"
-            d="M20.1 7.6c-.01.07-.02.14-.03.21C19.3 12 16.6 13.9 12.6 13.9h-2.1
-               a.8.8 0 0 0-.79.68l-1.21 7.67a.4.4 0 0 0 .4.46h2.8
-               a.7.7 0 0 0 .69-.59l.03-.16.55-3.47.04-.19a.7.7 0 0 1 .69-.59h.44
-               c2.82 0 5.02-1.14 5.67-4.45.27-1.38.13-2.53-.58-3.34
-               a2.77 2.77 0 0 0-.63-.42z"
-        />
-        <path
-            fill="#003087"
-            d="M19.4 7.3a5.8 5.8 0 0 0-.72-.16 9.1 9.1 0 0 0-1.44-.11h-4.37
-               a.7.7 0 0 0-.69.59l-.93 5.9-.03.17a.8.8 0 0 1 .79-.68h2.1
-               c3.3 0 5.5-1.7 6.19-4.78 0-.07.02-.14.03-.21
-               a3.74 3.74 0 0 0-.93-.72z"
-        />
-    </svg>
-);
+const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", mobile: "📱 Mobile", embedded: "🔌 Embedded", "3d": "🎲 3D" };
 
-const CalendarIcon = ({ size = 30, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-        <line x1="16" y1="2" x2="16" y2="6" />
-        <line x1="8" y1="2" x2="8" y2="6" />
-        <line x1="3" y1="10" x2="21" y2="10" />
-    </svg>
-);
-
-const LockIcon = ({ size = 30, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-);
-
-const UserIcon = ({ size = 30, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-        <circle cx="12" cy="7" r="4" />
-    </svg>
-);
-
-const MapPinIcon = ({ size = 30, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-        <circle cx="12" cy="10" r="3" />
-    </svg>
-);
-
-const LeafIcon = ({ size = 30, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z" />
-        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
-    </svg>
-);
-
-const ShieldIcon = ({ size = 30, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-);
-
-const ArrowRightIcon = ({ size = 30, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12" />
-        <polyline points="12 5 19 12 12 19" />
-    </svg>
-);
-
-const FolderIcon = ({ size = 20, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-    </svg>
-);
-
-const BadgeIcon = ({ size = 20, color = "currentColor" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
-        stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="8" r="6" />
-        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
-    </svg>
-);
-
-/* ─── Price helpers ──────────────────────────────────────── */
-const formatPrice = (num) => "$" + num.toLocaleString("en-US", { minimumFractionDigits: 0 });
-
-/* ─── Get today's date as "MMM DD, YYYY" ────────────────── */
-const getTodayFormatted = () =>
-    new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-
-/* ─── Section label helper ───────────────────────────────── */
-const SECTION_LABELS = {
-    web:      "🌐 Web",
-    ai:       "🤖 AI",
-    embedded: "🔌 Embedded",
-    "3d":     "🎲 3D",
+const ADDONS = {
+    web:      [{ key: "mobileAddon", label: "📱 Mobile App",       price: 5000,  description: "Add a full React Native / Flutter mobile app to your web project" },  { key: "aiAddon",     label: "🤖 AI Integration",  price: 10000, description: "Embed AI features — chatbot, recommendations, or NLP" }],
+    ai:       [{ key: "webAddon",    label: "🌐 Web Project",      price: 15000, description: "Pair your AI solution with a complete web platform" },                  { key: "mobileAddon", label: "📱 Mobile App",       price: 5000,  description: "Ship your AI features inside a native mobile app" }],
+    mobile:   [{ key: "webAddon",    label: "🌐 Web Project",      price: 15000, description: "Launch a web version alongside your mobile app" },                      { key: "aiAddon",     label: "🤖 AI Integration",  price: 10000, description: "Supercharge your mobile app with smart AI capabilities" }],
+    embedded: [{ key: "webAddon",    label: "🌐 Web Dashboard",    price: 15000, description: "Build a web interface to monitor and control your embedded system" },   { key: "mobileAddon", label: "📱 Mobile Control",   price: 5000,  description: "Add a mobile app to remotely control your hardware" }],
+    "3d":     [{ key: "webAddon",    label: "🌐 Web Integration",  price: 15000, description: "Embed your 3D experience into a full custom web platform" },            { key: "mobileAddon", label: "📱 Mobile Version",   price: 5000,  description: "Bring your 3D experience to iOS and Android" }],
 };
 
-/* ─── Add-on prices ──────────────────────────────────────── */
-const MOBILE_ADDON_PRICE = 5000;
-const WEB_ADDON_PRICE    = 15000;
+// ── Your Vodafone Cash number ──────────────────────────────
+const VODAFONE_CASH_NUMBER = "01XXXXXXXXX";
 
-/* ─── Component ─────────────────────────────────────────── */
+const AddonCard = ({ addon, active, onToggle }) => (
+    <div className={`pay-addon-card ${active ? "pay-addon-card--active" : ""}`} onClick={onToggle}>
+        <div className="pay-addon-info">
+            <span className="pay-addon-label">{addon.label}</span>
+            <span className="pay-addon-desc">{addon.description}</span>
+        </div>
+        <div className="pay-addon-right">
+            <span className="pay-addon-price">+{formatPrice(addon.price)}</span>
+            <div className={`pay-addon-toggle ${active ? "pay-addon-toggle--on" : ""}`}>
+                <div className="pay-addon-toggle-dot" />
+            </div>
+        </div>
+    </div>
+);
 
 export const Payment = ({ theme, toggleTheme }) => {
-    const [activeMethod, setActiveMethod] = useState("credit");
-    const [projectName, setProjectName]   = useState("");
-    const [clientName, setClientName]     = useState("");
-    const [submitting, setSubmitting]     = useState(false);
-    const [submitError, setSubmitError]   = useState(null);
-    const [submitted, setSubmitted]       = useState(false);
+    const [projectName,    setProjectName]    = useState("");
+    const [clientName,     setClientName]     = useState("");
+    const [senderName,     setSenderName]     = useState("");
+    const [whatsappNum,    setWhatsappNum]     = useState("");
+    const [screenshot,     setScreenshot]     = useState(null);
+    const [screenshotPrev, setScreenshotPrev] = useState(null);
+    const [screenshotB64,  setScreenshotB64]  = useState("");
+    const [submitting,     setSubmitting]     = useState(false);
+    const [submitError,    setSubmitError]    = useState(null);
+    const [submitted,      setSubmitted]      = useState(false);
 
-    const { state } = useLocation();
+    const { state }  = useLocation();
     const ActiveLink = "var(--active-link)";
 
     const selectedPlan = state?.plan ?? {
-        name:        "Easy",
-        icon:        null,
-        basePrice:   15000,
-        mobileAddon: false,
-        webAddon:    false,
-        section:     "web",
-        features: [
-            "Basic UI/UX Design",
-            "Frontend implementation",
-            "Weekly updates",
-            "Email Support",
-        ],
+        name: "Easy", icon: null, basePrice: 15000, section: "web",
+        features: ["Basic UI/UX Design", "Frontend implementation", "Weekly updates", "Email Support"],
     };
 
-    // ── Price calculations ─────────────────────────────────
-    const subtotal      = selectedPlan.basePrice;
-    const mobileAddon   = selectedPlan.mobileAddon ? MOBILE_ADDON_PRICE : 0;
-    const webAddon      = selectedPlan.webAddon    ? WEB_ADDON_PRICE    : 0;
-    const addonsTotal   = mobileAddon + webAddon;
-    const taxRate       = 0.09;
-    const taxes         = Math.round((subtotal + addonsTotal) * taxRate);
-    const service       = 0;
-    const total         = subtotal + addonsTotal + taxes + service;
+    const sectionAddons = ADDONS[selectedPlan.section] ?? [];
+    const [addonState, setAddonState] = useState(
+        Object.fromEntries(sectionAddons.map((a) => [a.key, false]))
+    );
+    const toggleAddon = (key) => setAddonState((prev) => ({ ...prev, [key]: !prev[key] }));
 
-    // ── Confirm & Pay ──────────────────────────────────────
+    const subtotal    = selectedPlan.basePrice;
+    const addonsTotal = sectionAddons.reduce((sum, a) => sum + (addonState[a.key] ? a.price : 0), 0);
+    const taxes       = Math.round((subtotal + addonsTotal) * 0.09);
+    const total       = subtotal + addonsTotal + taxes;
+    const deposit     = Math.round(total * 0.30);
+
+    // ── Screenshot → base64 ────────────────────────────────
+    const handleScreenshot = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setScreenshot(file);
+        setScreenshotPrev(URL.createObjectURL(file));
+        const reader = new FileReader();
+        reader.onloadend = () => setScreenshotB64(reader.result);
+        reader.readAsDataURL(file);
+    };
+
+    // ── Submit ─────────────────────────────────────────────
     const handleConfirm = async () => {
-        if (!projectName.trim() || !clientName.trim()) {
-            setSubmitError("Please fill in both Project Name and Client Name.");
-            return;
-        }
+        if (!projectName.trim() || !clientName.trim()) { setSubmitError("Please fill in Project Name and Client Name."); return; }
+        if (!senderName.trim())  { setSubmitError("Please enter the name used for the Vodafone Cash transfer."); return; }
+        if (!whatsappNum.trim()) { setSubmitError("Please enter your WhatsApp number."); return; }
+        if (!screenshot)         { setSubmitError("Please upload a screenshot of your Vodafone Cash payment."); return; }
 
         setSubmitError(null);
         setSubmitting(true);
-
         try {
             await createProject({
-                name:        projectName.trim(),
-                client:      clientName.trim(),
-                price:       total,
-                mobileAddon: selectedPlan.mobileAddon ?? false,
-                webAddon:    selectedPlan.webAddon    ?? false,
-                section:     selectedPlan.section     ?? "web",
-                due:         getTodayFormatted(),
-                status:      "review",
-                progress:    0,
+                name:              projectName.trim(),
+                client:            clientName.trim(),
+                price:             total,
+                mobileAddon:       addonState.mobileAddon ?? false,
+                webAddon:          addonState.webAddon    ?? false,
+                aiAddon:           addonState.aiAddon     ?? false,
+                section:           selectedPlan.section   ?? "web",
+                due:               getTodayFormatted(),
+                status:            "review",
+                progress:          0,
+                senderName:        senderName.trim(),
+                whatsappNumber:    whatsappNum.trim(),
+                paymentScreenshot: screenshotB64,
+                depositPaid:       true,
+                depositAmount:     deposit,
             });
             setSubmitted(true);
         } catch (err) {
@@ -205,123 +128,120 @@ export const Payment = ({ theme, toggleTheme }) => {
     return (
         <div data-theme={theme}>
             <Header onToggleTheme={toggleTheme} />
-
             <div className="pay">
                 <div className="container">
-
-                    {/* ── Hero ── */}
                     <div className="pay-cont">
                         <div className="pay-head">
                             <h1>Secure &amp; Transparent Payments</h1>
-                            <p>All payments are encrypted and protected to ensure your data stays safe.</p>
+                            <p>All payments are processed via Vodafone Cash. Simple, fast, and secure.</p>
                             <img src={Dashsd} alt="" />
                         </div>
                     </div>
 
-                    {/* ── Payment form ── */}
                     <div className="pay-form-section">
 
-                        {/* Left: form */}
+                        {/* ── Left: form ── */}
                         <div className="pay-form">
-                            <h2 className="pay-form-title">Payment Method</h2>
+                            <h2 className="pay-form-title">Vodafone Cash Payment</h2>
 
-                            <div className="pay-methods">
-                                <button
-                                    className={`pay-method-btn ${activeMethod === "credit" ? "active" : ""}`}
-                                    onClick={() => setActiveMethod("credit")}
-                                >
-                                    <CreditCardIcon size={30} color={activeMethod === "credit" ? ActiveLink : "#888"} />
-                                    Credit Card
-                                    {activeMethod === "credit" && <span className="pay-method-dot" />}
-                                </button>
-                                <button
-                                    className={`pay-method-btn ${activeMethod === "paypal" ? "active" : ""}`}
-                                    onClick={() => setActiveMethod("paypal")}
-                                >
-                                    <PayPalIcon size={30} />
-                                    Pay Pal
-                                    {activeMethod === "paypal" && <span className="pay-method-dot" />}
-                                </button>
+                            {/* Deposit notice */}
+                            <div className="pay-deposit-notice">
+                                <InfoIcon size={18} color="var(--active-link)" />
+                                <div>
+                                    <p className="pay-deposit-notice__title">30% Deposit Required to Start</p>
+                                    <p className="pay-deposit-notice__sub">
+                                        Send <strong>{formatPrice(deposit)}</strong> to our Vodafone Cash number below to confirm your project.
+                                        The remaining <strong>{formatPrice(total - deposit)}</strong> is due on delivery.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* VF Cash number box */}
+                            <div className="pay-vf-box">
+                                <div className="pay-vf-box__label">Send to Vodafone Cash Number</div>
+                                <div className="pay-vf-box__number">{VODAFONE_CASH_NUMBER}</div>
+                                <div className="pay-vf-box__amount">
+                                    Amount to send: <strong>{formatPrice(deposit)}</strong>
+                                    <span className="pay-vf-box__pct"> (30% deposit)</span>
+                                </div>
                             </div>
 
                             <div className="pay-divider" />
 
-                            <label className="pay-label">Card Information</label>
+                            {/* Sender name */}
+                            <label className="pay-label">Name Used for Transfer</label>
                             <div className="pay-input-wrap">
-                                <CreditCardIcon size={30} color={ActiveLink} />
-                                <input className="pay-input" placeholder="0000 0000 0000 0000" />
+                                <UserIcon size={20} color={ActiveLink} />
+                                <input className="pay-input" placeholder="Name on your Vodafone Cash account"
+                                    value={senderName} onChange={(e) => { setSenderName(e.target.value); setSubmitError(null); }} />
                             </div>
 
-                            <div className="pay-row">
-                                <div className="pay-input-wrap">
-                                    <CalendarIcon size={30} color={ActiveLink} />
-                                    <input className="pay-input" placeholder="MM \ YY" />
-                                </div>
-                                <div className="pay-input-wrap">
-                                    <LockIcon size={30} color={ActiveLink} />
-                                    <input className="pay-input" placeholder="CVC" />
-                                </div>
+                            {/* WhatsApp */}
+                            <label className="pay-label">WhatsApp Number</label>
+                            <div className="pay-input-wrap">
+                                <PhoneIcon size={20} color={ActiveLink} />
+                                <input className="pay-input" placeholder="e.g. 01012345678"
+                                    value={whatsappNum} onChange={(e) => { setWhatsappNum(e.target.value); setSubmitError(null); }} />
                             </div>
 
-                            <label className="pay-label">Name on Card</label>
-                            <div className="pay-input-wrap">
-                                <UserIcon size={30} color={ActiveLink} />
-                                <input className="pay-input" placeholder="Joe Doe" />
-                            </div>
+                            {/* Screenshot */}
+                            <label className="pay-label">Payment Screenshot</label>
+                            <label className={`pay-upload-zone ${screenshotPrev ? "pay-upload-zone--filled" : ""}`}>
+                                <input type="file" accept="image/*" style={{ display:"none" }} onChange={handleScreenshot} />
+                                {screenshotPrev ? (
+                                    <div className="pay-upload-preview">
+                                        <img src={screenshotPrev} alt="Payment screenshot" />
+                                        <span className="pay-upload-change">Click to change</span>
+                                    </div>
+                                ) : (
+                                    <div className="pay-upload-placeholder">
+                                        <UploadIcon size={28} color="var(--active-link)" />
+                                        <span>Upload Vodafone Cash screenshot</span>
+                                        <span className="pay-upload-hint">PNG, JPG up to 10MB</span>
+                                    </div>
+                                )}
+                            </label>
 
-                            <label className="pay-label">Zip Code</label>
-                            <div className="pay-input-wrap">
-                                <MapPinIcon size={30} color={ActiveLink} />
-                                <input className="pay-input" placeholder="1001" />
-                            </div>
+                            {/* Add-ons */}
+                            {sectionAddons.length > 0 && (
+                                <>
+                                    <div className="pay-divider" />
+                                    <label className="pay-label">Optional Add-ons</label>
+                                    <div className="pay-addons">
+                                        {sectionAddons.map((addon) => (
+                                            <AddonCard key={addon.key} addon={addon} active={addonState[addon.key]} onToggle={() => toggleAddon(addon.key)} />
+                                        ))}
+                                    </div>
+                                </>
+                            )}
                         </div>
 
-                        {/* Right: order summary */}
+                        {/* ── Right: summary ── */}
                         <div className="pay-summary">
                             <h2 className="pay-summary-title">Order Summary</h2>
 
-                            {/* ── Section badge ── */}
                             <div className={`pay-section-badge pay-section-badge--${selectedPlan.section}`}>
                                 {SECTION_LABELS[selectedPlan.section] ?? selectedPlan.section}
                             </div>
 
-                            {/* ── Plan row ── */}
                             <div className="pay-plan-row">
                                 <div className="pay-plan-icon">
-                                    {selectedPlan.icon
-                                        ? <img src={selectedPlan.icon} alt={selectedPlan.name} style={{ width: 30, height: 30 }} />
-                                        : <LeafIcon size={30} color={ActiveLink} />
-                                    }
+                                    {selectedPlan.icon ? <img src={selectedPlan.icon} alt={selectedPlan.name} style={{ width:30, height:30 }} /> : <LeafIcon size={30} color={ActiveLink} />}
                                 </div>
                                 <span className="pay-plan-name">{selectedPlan.name}</span>
                                 <span className="pay-plan-price">{formatPrice(subtotal)}</span>
                             </div>
 
-                            {/* ── Mobile Add-on row (Web plans) ── */}
-                            {selectedPlan.mobileAddon && (
-                                <div className="pay-plan-row">
-                                    <div className="pay-plan-icon">
-                                        <span style={{ fontSize: 22 }}>📱</span>
-                                    </div>
-                                    <span className="pay-plan-name">Mobile App Add-on</span>
-                                    <span className="pay-plan-price">{formatPrice(mobileAddon)}</span>
+                            {sectionAddons.filter((a) => addonState[a.key]).map((addon) => (
+                                <div key={addon.key} className="pay-plan-row">
+                                    <div className="pay-plan-icon"><span style={{ fontSize:22 }}>{addon.label.split(" ")[0]}</span></div>
+                                    <span className="pay-plan-name">{addon.label.replace(/^[^\s]+\s/, "")}</span>
+                                    <span className="pay-plan-price">{formatPrice(addon.price)}</span>
                                 </div>
-                            )}
-
-                            {/* ── Web Add-on row (AI plans) ── */}
-                            {selectedPlan.webAddon && (
-                                <div className="pay-plan-row">
-                                    <div className="pay-plan-icon">
-                                        <span style={{ fontSize: 22 }}>🌐</span>
-                                    </div>
-                                    <span className="pay-plan-name">Web Project Add-on</span>
-                                    <span className="pay-plan-price">{formatPrice(webAddon)}</span>
-                                </div>
-                            )}
+                            ))}
 
                             <div className="pay-summary-divider" />
 
-                            {/* ── Totals ── */}
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Subtotal</span>
                                 <span className="pay-summary-value">{formatPrice(subtotal + addonsTotal)}</span>
@@ -342,59 +262,57 @@ export const Payment = ({ theme, toggleTheme }) => {
                                 <span className="pay-total-value">{formatPrice(total)}</span>
                             </div>
 
+                            {/* Deposit breakdown */}
+                            <div className="pay-deposit-breakdown">
+                                <div className="pay-deposit-breakdown__row pay-deposit-breakdown__row--now">
+                                    <span>Due now (30% deposit)</span>
+                                    <strong>{formatPrice(deposit)}</strong>
+                                </div>
+                                <div className="pay-deposit-breakdown__row pay-deposit-breakdown__row--later">
+                                    <span>Due on delivery (70%)</span>
+                                    <strong>{formatPrice(total - deposit)}</strong>
+                                </div>
+                            </div>
+
                             <div className="pay-summary-divider" />
 
-                            {/* ── Project & Client fields ── */}
                             <div className="pay-project-section">
                                 <p className="pay-project-label">Project Details</p>
-
                                 <div className="pay-input-wrap">
                                     <FolderIcon size={20} color={ActiveLink} />
-                                    <input
-                                        className="pay-input"
-                                        placeholder="Project Name"
-                                        value={projectName}
-                                        onChange={(e) => { setProjectName(e.target.value); setSubmitError(null); }}
-                                    />
+                                    <input className="pay-input" placeholder="Project Name" value={projectName}
+                                        onChange={(e) => { setProjectName(e.target.value); setSubmitError(null); }} />
                                 </div>
-
                                 <div className="pay-input-wrap">
                                     <BadgeIcon size={20} color={ActiveLink} />
-                                    <input
-                                        className="pay-input"
-                                        placeholder="Client Name"
-                                        value={clientName}
-                                        onChange={(e) => { setClientName(e.target.value); setSubmitError(null); }}
-                                    />
+                                    <input className="pay-input" placeholder="Client Name" value={clientName}
+                                        onChange={(e) => { setClientName(e.target.value); setSubmitError(null); }} />
                                 </div>
                             </div>
 
                             {submitError && <p className="pay-error">{submitError}</p>}
-                            {submitted   && <p className="pay-success">✓ Project created successfully!</p>}
 
-                            <button
-                                className="pay-confirm-btn"
-                                onClick={handleConfirm}
-                                disabled={submitting || submitted}
-                            >
-                                {submitting
-                                    ? "Processing..."
-                                    : submitted
-                                    ? "Payment Confirmed ✓"
-                                    : <>Confirm and Pay <ArrowRightIcon size={30} color="#111" /></>
-                                }
-                            </button>
+                            {submitted ? (
+                                <div className="pay-submitted-msg">
+                                    <div className="pay-submitted-msg__icon">✓</div>
+                                    <p className="pay-submitted-msg__title">Request Submitted!</p>
+                                    <p className="pay-submitted-msg__sub">We'll review your payment and reach out via WhatsApp within 24 hours.</p>
+                                </div>
+                            ) : (
+                                <button className="pay-confirm-btn" onClick={handleConfirm} disabled={submitting}>
+                                    {submitting ? "Submitting…" : <> Confirm Payment <ArrowRightIcon size={26} color="#111" /></>}
+                                </button>
+                            )}
 
                             <div className="pay-ssl">
-                                <ShieldIcon size={30} color="#555" />
-                                Payments are 256-bit SSL Encrypted
+                                <ShieldIcon size={24} color="#555" />
+                                Your details are kept strictly confidential
                             </div>
                         </div>
 
                     </div>
                 </div>
             </div>
-
             <Footer />
         </div>
     );

@@ -39,11 +39,13 @@ footer {
                 font-size: 2.5rem;
                 line-height: 1.6;
                 transition: opacity 0.3s ease;
+                margin-bottom: 2rem;
                 
                 &:hover {
                     opacity: 0.9;
                 }
             }
+
         }
         
         .links {
@@ -108,6 +110,41 @@ footer {
                     left: 50%;
                 }
             }
+
+            /* ── Contact info under links ── */
+            .foot-contact {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+                margin-top: 2.5rem;
+                margin-left: 3rem;
+
+                .foot-contact__item {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 10px;
+                    font-size: 1.8rem;
+                    color: var(--text-color);
+                    text-decoration: none;
+                    opacity: 0.55;
+                    transition: opacity 0.25s ease, color 0.25s ease, transform 0.25s ease;
+                    width: max-content;
+
+                    svg {
+                        color: var(--logo-text-color);
+                        flex-shrink: 0;
+                        transition: color 0.25s ease;
+                    }
+
+                    &:hover {
+                        opacity: 1;
+                        color: var(--active-link);
+                        transform: translateX(8px);
+
+                        svg { color: var(--active-link); }
+                    }
+                }
+            }
         }
     }
     text-decoration: none;
@@ -133,68 +170,36 @@ footer {
 
 /* Keyframe Animations */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 0.7;
-    }
+    from { opacity: 0; }
+    to   { opacity: 0.7; }
 }
 
 @keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-30px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes fadeInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes expandWidth {
-    from {
-        width: 0;
-    }
-    to {
-        width: 50%;
-    }
+    from { width: 0; }
+    to   { width: 50%; }
 }
 
-/* Tablet Styles */
+/* Tablet */
 @media (max-width: 1024px) {
     footer {
         padding: 3rem 0 1.5rem;
@@ -206,41 +211,26 @@ footer {
                 padding: 2rem;
                 
                 .logo {
-                    img {
-                        width: 6rem;
-                    }
-                    
-                    h1 {
-                        font-size: 2.5rem;
-                    }
+                    img { width: 6rem; }
+                    h1  { font-size: 2.5rem; }
                 }
                 
-                p {
-                    font-size: 2rem;
-                }
+                p { font-size: 2rem; }
+
+                .foot-contact .foot-contact__item { font-size: 1.6rem; }
             }
             
             .links {
-                h2 {
-                    font-size: 1.8rem;
-                }
-                
-                a {
-                    font-size: 1.4rem;
-                    margin-left: 2rem;
-                    margin-top: 1.5rem;
-                }
+                h2 { font-size: 1.8rem; }
+                a  { font-size: 1.4rem; margin-left: 2rem; margin-top: 1.5rem; }
             }
         }
         
-        h3 {
-            font-size: 1.4rem;
-            margin-top: 3rem;
-        }
+        h3 { font-size: 1.4rem; margin-top: 3rem; }
     }
 }
 
-/* Mobile Styles */
+/* Mobile */
 @media (max-width: 768px) {
     footer {
         padding: 2rem 0 1rem;
@@ -256,21 +246,11 @@ footer {
                 .logo {
                     justify-content: center;
                     margin-bottom: 1.5rem;
-                    
-                    img {
-                        width: 5rem;
-                    }
-                    
-                    h1 {
-                        font-size: 2.2rem;
-                        margin-left: 1.5rem;
-                    }
+                    img { width: 5rem; }
+                    h1  { font-size: 2.2rem; margin-left: 1.5rem; }
                 }
                 
-                p {
-                    font-size: 1.6rem;
-                    text-align: center;
-                }
+                p { font-size: 1.6rem; text-align: center; }
             }
             
             .links {
@@ -291,31 +271,24 @@ footer {
                 h2 {
                     font-size: 1.8rem;
                     text-align: center;
-                    
-                    &::after {
-                        left: 50%;
-                        transform: translateX(-50%);
-                    }
+                    &::after { left: 50%; transform: translateX(-50%); }
                 }
                 
-                a {
+                a { margin-left: 0; margin-top: 1.5rem; font-size: 1.5rem; text-align: center; }
+
+                .foot-contact {
                     margin-left: 0;
-                    margin-top: 1.5rem;
-                    font-size: 1.5rem;
-                    text-align: center;
+                    align-items: center;
+                    .foot-contact__item { font-size: 1.4rem; }
                 }
             }
         }
         
-        h3 {
-            font-size: 1.3rem;
-            margin-top: 2rem;
-            padding: 1.5rem 1rem;
-        }
+        h3 { font-size: 1.3rem; margin-top: 2rem; padding: 1.5rem 1rem; }
     }
 }
 
-/* Small Mobile Styles */
+/* Small Mobile */
 @media (max-width: 480px) {
     footer {
         padding: 1.5rem 0 1rem;
@@ -327,42 +300,22 @@ footer {
                 .logo {
                     flex-direction: column;
                     gap: 1rem;
-                    
-                    img {
-                        width: 4.5rem;
-                    }
-                    
-                    h1 {
-                        font-size: 2rem;
-                        margin-left: 0;
-                        text-align: center;
-                        width: auto;
-                    }
+                    img { width: 4.5rem; }
+                    h1  { font-size: 2rem; margin-left: 0; text-align: center; width: auto; }
                 }
                 
-                p {
-                    font-size: 1.4rem;
-                }
+                p { font-size: 1.4rem; }
             }
             
             .links {
                 padding-top: 1.5rem;
-                
-                h2 {
-                    font-size: 1.6rem;
-                }
-                
-                a {
-                    margin-top: 1.2rem;
-                    font-size: 1.3rem;
-                }
+                h2 { font-size: 1.6rem; }
+                a  { margin-top: 1.2rem; font-size: 1.3rem; }
+                .foot-contact .foot-contact__item { font-size: 1.2rem; }
             }
         }
         
-        h3 {
-            font-size: 1.2rem;
-            padding: 1rem 0.5rem;
-        }
+        h3 { font-size: 1.2rem; padding: 1rem 0.5rem; }
     }
 }
 
@@ -372,36 +325,20 @@ footer {
         .foot-cont {
             .left-foot {
                 .logo {
-                    img {
-                        width: 4rem;
-                    }
-                    
-                    h1 {
-                        font-size: 1.8rem;
-                    }
+                    img { width: 4rem; }
+                    h1  { font-size: 1.8rem; }
                 }
-                
-                p {
-                    font-size: 1.3rem;
-                }
+                p { font-size: 1.3rem; }
             }
             
             .links {
-                h2 {
-                    font-size: 1.5rem;
-                }
-                
-                a {
-                    font-size: 1.2rem;
-                    margin-top: 1rem;
-                }
+                h2 { font-size: 1.5rem; }
+                a  { font-size: 1.2rem; margin-top: 1rem; }
+                .foot-contact .foot-contact__item { font-size: 1.1rem; }
             }
         }
         
-        h3 {
-            font-size: 1.1rem;
-            padding: 1rem 0.5rem;
-        }
+        h3 { font-size: 1.1rem; padding: 1rem 0.5rem; }
     }
 }
 
@@ -421,22 +358,11 @@ footer {
                 .logo {
                     justify-content: flex-start;
                     flex-direction: row;
-                    
-                    img {
-                        width: 4.5rem;
-                    }
-                    
-                    h1 {
-                        font-size: 1.8rem;
-                        margin-left: 1rem;
-                        text-align: left;
-                    }
+                    img { width: 4.5rem; }
+                    h1  { font-size: 1.8rem; margin-left: 1rem; text-align: left; }
                 }
                 
-                p {
-                    font-size: 1.3rem;
-                    text-align: left;
-                }
+                p { font-size: 1.3rem; text-align: left; }
             }
             
             .links {
@@ -457,39 +383,26 @@ footer {
                 h2 {
                     font-size: 1.5rem;
                     text-align: left;
-                    
-                    &::after {
-                        left: 0;
-                        transform: translateX(0);
-                    }
+                    &::after { left: 0; transform: translateX(0); }
                 }
                 
-                a {
+                a { margin-left: 2rem; margin-top: 1rem; font-size: 1.2rem; text-align: left; }
+
+                .foot-contact {
                     margin-left: 2rem;
-                    margin-top: 1rem;
-                    font-size: 1.2rem;
-                    text-align: left;
+                    .foot-contact__item { font-size: 1.2rem; }
                 }
             }
         }
         
-        h3 {
-            font-size: 1.2rem;
-            margin-top: 1.5rem;
-        }
+        h3 { font-size: 1.2rem; margin-top: 1.5rem; }
     }
 }
 
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
     footer {
-        * {
-            animation: none !important;
-            transition: none !important;
-        }
-        
-        .foot-cont .links h2::after {
-            width: 50%;
-        }
+        * { animation: none !important; transition: none !important; }
+        .foot-cont .links h2::after { width: 50%; }
     }
 }

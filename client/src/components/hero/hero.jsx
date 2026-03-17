@@ -166,7 +166,9 @@ export const Hero = () => {
                                  </Link>
                             </div>
                             <div className="view-case">
-                                <button>View Case Studies</button>
+                                <Link to="/blog">
+                                    <button>View Case Studies</button>
+                                </Link>
                             </div>
                         </div>
                     </div>

@@ -8,19 +8,19 @@ const statsData = [
   {
     id: 1,
     icon: People,
-    value: "50+",
+    value: "5+",
     label: "Senior Engineers"
   },
   {
     id: 2,
     icon: Clock,
-    value: "10+",
+    value: "4+",
     label: "Years Shipping"
   },
   {
     id: 3,
     icon: Rocket,
-    value: "200+",
+    value: "10+",
     label: "Projects Delivered"
   },
   {
