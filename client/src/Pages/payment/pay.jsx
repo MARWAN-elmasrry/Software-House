@@ -22,15 +22,42 @@ const getTodayFormatted = () => new Date().toLocaleDateString("en-US", { month: 
 const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", mobile: "📱 Mobile", embedded: "🔌 Embedded", "3d": "🎲 3D" };
 
 const ADDONS = {
-    web:      [{ key: "mobileAddon", label: "📱 Mobile App",       price: 5000,  description: "Add a full React Native / Flutter mobile app to your web project" },  { key: "aiAddon",     label: "🤖 AI Integration",  price: 10000, description: "Embed AI features — chatbot, recommendations, or NLP" }],
-    ai:       [{ key: "webAddon",    label: "🌐 Web Project",      price: 15000, description: "Pair your AI solution with a complete web platform" },                  { key: "mobileAddon", label: "📱 Mobile App",       price: 5000,  description: "Ship your AI features inside a native mobile app" }],
-    mobile:   [{ key: "webAddon",    label: "🌐 Web Project",      price: 15000, description: "Launch a web version alongside your mobile app" },                      { key: "aiAddon",     label: "🤖 AI Integration",  price: 10000, description: "Supercharge your mobile app with smart AI capabilities" }],
-    embedded: [{ key: "webAddon",    label: "🌐 Web Dashboard",    price: 15000, description: "Build a web interface to monitor and control your embedded system" },   { key: "mobileAddon", label: "📱 Mobile Control",   price: 5000,  description: "Add a mobile app to remotely control your hardware" }],
-    "3d":     [{ key: "webAddon",    label: "🌐 Web Integration",  price: 15000, description: "Embed your 3D experience into a full custom web platform" },            { key: "mobileAddon", label: "📱 Mobile Version",   price: 5000,  description: "Bring your 3D experience to iOS and Android" }],
+    web:      [{ key: "mobileAddon", label: "📱 Mobile App",       price: 5000,  description: "Add a full React Native / Flutter mobile app · Vodafone Cash / Instapay" },  { key: "aiAddon",     label: "🤖 AI Integration",  price: 10000, description: "Embed AI features — chatbot, recommendations, or NLP · Vodafone Cash / Instapay" }],
+    ai:       [{ key: "webAddon",    label: "🌐 Web Project",      price: 15000, description: "Pair your AI solution with a complete web platform · Vodafone Cash / Instapay" },                  { key: "mobileAddon", label: "📱 Mobile App",       price: 5000,  description: "Ship your AI features inside a native mobile app · Vodafone Cash / Instapay" }],
+    mobile:   [{ key: "webAddon",    label: "🌐 Web Project",      price: 15000, description: "Launch a web version alongside your mobile app · Vodafone Cash / Instapay" },                      { key: "aiAddon",     label: "🤖 AI Integration",  price: 10000, description: "Supercharge your mobile app with smart AI capabilities · Vodafone Cash / Instapay" }],
+    embedded: [{ key: "webAddon",    label: "🌐 Web Dashboard",    price: 15000, description: "Build a web interface to monitor and control your embedded system · Vodafone Cash / Instapay" },   { key: "mobileAddon", label: "📱 Mobile Control",   price: 5000,  description: "Add a mobile app to remotely control your hardware · Vodafone Cash / Instapay" }],
+    "3d":     [{ key: "webAddon",    label: "🌐 Web Integration",  price: 15000, description: "Embed your 3D experience into a full custom web platform · Vodafone Cash / Instapay" },            { key: "mobileAddon", label: "📱 Mobile Version",   price: 5000,  description: "Bring your 3D experience to iOS and Android · Vodafone Cash / Instapay" }],
 };
 
-// ── Your Vodafone Cash number ──────────────────────────────
 const VODAFONE_CASH_NUMBER = "01XXXXXXXXX";
+const MAX_B64_BYTES        = 2 * 1024 * 1024;
+
+const compressImageToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            const canvas = document.createElement("canvas");
+            const attempt = (quality, maxDim) => {
+                let w = img.naturalWidth, h = img.naturalHeight;
+                if (w > maxDim || h > maxDim) {
+                    if (w >= h) { h = Math.round((h / w) * maxDim); w = maxDim; }
+                    else        { w = Math.round((w / h) * maxDim); h = maxDim; }
+                }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+                const b64 = canvas.toDataURL("image/jpeg", quality);
+                if (b64.length <= MAX_B64_BYTES || quality <= 0.1) { resolve(b64); return; }
+                const nextQ   = quality > 0.4 ? quality - 0.15 : quality - 0.05;
+                const nextDim = quality <= 0.4 ? Math.round(maxDim * 0.75) : maxDim;
+                attempt(Math.max(nextQ, 0.1), nextDim);
+            };
+            attempt(0.85, 1600);
+        };
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Failed to load image.")); };
+        img.src = url;
+    });
 
 const AddonCard = ({ addon, active, onToggle }) => (
     <div className={`pay-addon-card ${active ? "pay-addon-card--active" : ""}`} onClick={onToggle}>
@@ -55,6 +82,8 @@ export const Payment = ({ theme, toggleTheme }) => {
     const [screenshot,     setScreenshot]     = useState(null);
     const [screenshotPrev, setScreenshotPrev] = useState(null);
     const [screenshotB64,  setScreenshotB64]  = useState("");
+    const [imgError,       setImgError]       = useState(null);
+    const [compressing,    setCompressing]    = useState(false);
     const [submitting,     setSubmitting]     = useState(false);
     const [submitError,    setSubmitError]    = useState(null);
     const [submitted,      setSubmitted]      = useState(false);
@@ -75,27 +104,40 @@ export const Payment = ({ theme, toggleTheme }) => {
 
     const subtotal    = selectedPlan.basePrice;
     const addonsTotal = sectionAddons.reduce((sum, a) => sum + (addonState[a.key] ? a.price : 0), 0);
-    const taxes       = Math.round((subtotal + addonsTotal) * 0.09);
-    const total       = subtotal + addonsTotal + taxes;
+    const total       = subtotal + addonsTotal;
     const deposit     = Math.round(total * 0.30);
 
-    // ── Screenshot → base64 ────────────────────────────────
-    const handleScreenshot = (e) => {
+    const handleScreenshot = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            setImgError("Please upload an image file (PNG, JPG, etc.).");
+            return;
+        }
+        setImgError(null);
         setScreenshot(file);
         setScreenshotPrev(URL.createObjectURL(file));
-        const reader = new FileReader();
-        reader.onloadend = () => setScreenshotB64(reader.result);
-        reader.readAsDataURL(file);
+        setScreenshotB64("");
+        setCompressing(true);
+        try {
+            const b64 = await compressImageToBase64(file);
+            setScreenshotB64(b64);
+        } catch {
+            setImgError("Could not process this image. Please try a different file.");
+            setScreenshot(null);
+            setScreenshotPrev(null);
+        } finally {
+            setCompressing(false);
+        }
     };
 
-    // ── Submit ─────────────────────────────────────────────
     const handleConfirm = async () => {
         if (!projectName.trim() || !clientName.trim()) { setSubmitError("Please fill in Project Name and Client Name."); return; }
-        if (!senderName.trim())  { setSubmitError("Please enter the name used for the Vodafone Cash transfer."); return; }
+        if (!senderName.trim())  { setSubmitError("Please enter the name used for the Vodafone Cash / Instapay transfer."); return; }
         if (!whatsappNum.trim()) { setSubmitError("Please enter your WhatsApp number."); return; }
-        if (!screenshot)         { setSubmitError("Please upload a screenshot of your Vodafone Cash payment."); return; }
+        if (!screenshot)         { setSubmitError("Please upload a screenshot of your payment."); return; }
+        if (compressing)         { setSubmitError("Please wait — image is still being processed."); return; }
+        if (!screenshotB64)      { setSubmitError("Image failed to process. Please re-upload the screenshot."); return; }
 
         setSubmitError(null);
         setSubmitting(true);
@@ -114,7 +156,7 @@ export const Payment = ({ theme, toggleTheme }) => {
                 senderName:        senderName.trim(),
                 whatsappNumber:    whatsappNum.trim(),
                 paymentScreenshot: screenshotB64,
-                depositPaid:       true,
+                depositPaid:       false,
                 depositAmount:     deposit,
             });
             setSubmitted(true);
@@ -125,6 +167,8 @@ export const Payment = ({ theme, toggleTheme }) => {
         }
     };
 
+    const activeAddons = sectionAddons.filter((a) => addonState[a.key]);
+
     return (
         <div data-theme={theme}>
             <Header onToggleTheme={toggleTheme} />
@@ -133,7 +177,7 @@ export const Payment = ({ theme, toggleTheme }) => {
                     <div className="pay-cont">
                         <div className="pay-head">
                             <h1>Secure &amp; Transparent Payments</h1>
-                            <p>All payments are processed via Vodafone Cash. Simple, fast, and secure.</p>
+                            <p>All payments are processed via Vodafone Cash or Instapay. Simple, fast, and secure.</p>
                             <img src={Dashsd} alt="" />
                         </div>
                     </div>
@@ -142,23 +186,21 @@ export const Payment = ({ theme, toggleTheme }) => {
 
                         {/* ── Left: form ── */}
                         <div className="pay-form">
-                            <h2 className="pay-form-title">Vodafone Cash Payment</h2>
+                            <h2 className="pay-form-title">Vodafone Cash / Instapay Payment</h2>
 
-                            {/* Deposit notice */}
                             <div className="pay-deposit-notice">
                                 <InfoIcon size={18} color="var(--active-link)" />
                                 <div>
                                     <p className="pay-deposit-notice__title">30% Deposit Required to Start</p>
                                     <p className="pay-deposit-notice__sub">
-                                        Send <strong>{formatPrice(deposit)}</strong> to our Vodafone Cash number below to confirm your project.
+                                        Send <strong>{formatPrice(deposit)}</strong> to our Vodafone Cash or Instapay number below to confirm your project.
                                         The remaining <strong>{formatPrice(total - deposit)}</strong> is due on delivery.
                                     </p>
                                 </div>
                             </div>
 
-                            {/* VF Cash number box */}
                             <div className="pay-vf-box">
-                                <div className="pay-vf-box__label">Send to Vodafone Cash Number</div>
+                                <div className="pay-vf-box__label">Send to Vodafone Cash or Instapay Number</div>
                                 <div className="pay-vf-box__number">{VODAFONE_CASH_NUMBER}</div>
                                 <div className="pay-vf-box__amount">
                                     Amount to send: <strong>{formatPrice(deposit)}</strong>
@@ -168,15 +210,13 @@ export const Payment = ({ theme, toggleTheme }) => {
 
                             <div className="pay-divider" />
 
-                            {/* Sender name */}
                             <label className="pay-label">Name Used for Transfer</label>
                             <div className="pay-input-wrap">
                                 <UserIcon size={20} color={ActiveLink} />
-                                <input className="pay-input" placeholder="Name on your Vodafone Cash account"
+                                <input className="pay-input" placeholder="Name on your Vodafone Cash / Instapay account"
                                     value={senderName} onChange={(e) => { setSenderName(e.target.value); setSubmitError(null); }} />
                             </div>
 
-                            {/* WhatsApp */}
                             <label className="pay-label">WhatsApp Number</label>
                             <div className="pay-input-wrap">
                                 <PhoneIcon size={20} color={ActiveLink} />
@@ -184,11 +224,16 @@ export const Payment = ({ theme, toggleTheme }) => {
                                     value={whatsappNum} onChange={(e) => { setWhatsappNum(e.target.value); setSubmitError(null); }} />
                             </div>
 
-                            {/* Screenshot */}
                             <label className="pay-label">Payment Screenshot</label>
-                            <label className={`pay-upload-zone ${screenshotPrev ? "pay-upload-zone--filled" : ""}`}>
-                                <input type="file" accept="image/*" style={{ display:"none" }} onChange={handleScreenshot} />
-                                {screenshotPrev ? (
+                            <label className={`pay-upload-zone ${screenshotPrev ? "pay-upload-zone--filled" : ""} ${compressing ? "pay-upload-zone--compressing" : ""}`}>
+                                <input type="file" accept="image/*" style={{ display: "none" }} onChange={handleScreenshot} disabled={compressing} />
+                                {compressing ? (
+                                    <div className="pay-upload-placeholder">
+                                        <div className="pay-upload-spinner" />
+                                        <span>Compressing image…</span>
+                                        <span className="pay-upload-hint">Optimizing to under 2 MB</span>
+                                    </div>
+                                ) : screenshotPrev ? (
                                     <div className="pay-upload-preview">
                                         <img src={screenshotPrev} alt="Payment screenshot" />
                                         <span className="pay-upload-change">Click to change</span>
@@ -196,13 +241,13 @@ export const Payment = ({ theme, toggleTheme }) => {
                                 ) : (
                                     <div className="pay-upload-placeholder">
                                         <UploadIcon size={28} color="var(--active-link)" />
-                                        <span>Upload Vodafone Cash screenshot</span>
-                                        <span className="pay-upload-hint">PNG, JPG up to 10MB</span>
+                                        <span>Upload Vodafone Cash / Instapay screenshot</span>
+                                        <span className="pay-upload-hint">PNG, JPG — auto-compressed to 2 MB</span>
                                     </div>
                                 )}
                             </label>
+                            {imgError && <p className="pay-img-error">{imgError}</p>}
 
-                            {/* Add-ons */}
                             {sectionAddons.length > 0 && (
                                 <>
                                     <div className="pay-divider" />
@@ -224,35 +269,36 @@ export const Payment = ({ theme, toggleTheme }) => {
                                 {SECTION_LABELS[selectedPlan.section] ?? selectedPlan.section}
                             </div>
 
+                            {/* ── Plan row ── */}
                             <div className="pay-plan-row">
                                 <div className="pay-plan-icon">
-                                    {selectedPlan.icon ? <img src={selectedPlan.icon} alt={selectedPlan.name} style={{ width:30, height:30 }} /> : <LeafIcon size={30} color={ActiveLink} />}
+                                    {selectedPlan.icon
+                                        ? <img src={selectedPlan.icon} alt={selectedPlan.name} style={{ width: 30, height: 30 }} />
+                                        : <LeafIcon size={30} color={ActiveLink} />}
                                 </div>
                                 <span className="pay-plan-name">{selectedPlan.name}</span>
                                 <span className="pay-plan-price">{formatPrice(subtotal)}</span>
                             </div>
 
-                            {sectionAddons.filter((a) => addonState[a.key]).map((addon) => (
-                                <div key={addon.key} className="pay-plan-row">
-                                    <div className="pay-plan-icon"><span style={{ fontSize:22 }}>{addon.label.split(" ")[0]}</span></div>
-                                    <span className="pay-plan-name">{addon.label.replace(/^[^\s]+\s/, "")}</span>
-                                    <span className="pay-plan-price">{formatPrice(addon.price)}</span>
+                            {/* ── Active addon rows — appear immediately under plan, above divider ── */}
+                            {activeAddons.length > 0 && (
+                                <div className="pay-addon-rows">
+                                    {activeAddons.map((addon) => (
+                                        <div key={addon.key} className="pay-addon-row">
+                                            <span className="pay-addon-row__emoji">{addon.label.split(" ")[0]}</span>
+                                            <span className="pay-addon-row__name">{addon.label.replace(/^[^\s]+\s/, "")}</span>
+                                            <span className="pay-addon-row__price">+{formatPrice(addon.price)}</span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            )}
 
                             <div className="pay-summary-divider" />
 
+                            {/* ── Subtotal (updates as addons toggle) ── */}
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Subtotal</span>
                                 <span className="pay-summary-value">{formatPrice(subtotal + addonsTotal)}</span>
-                            </div>
-                            <div className="pay-summary-row">
-                                <span className="pay-summary-label">Taxes (Estimated 9%)</span>
-                                <span className="pay-summary-value">{formatPrice(taxes)}</span>
-                            </div>
-                            <div className="pay-summary-row">
-                                <span className="pay-summary-label">Service Fee</span>
-                                <span className="pay-summary-value">$0.00</span>
                             </div>
 
                             <div className="pay-summary-divider" />
@@ -262,7 +308,6 @@ export const Payment = ({ theme, toggleTheme }) => {
                                 <span className="pay-total-value">{formatPrice(total)}</span>
                             </div>
 
-                            {/* Deposit breakdown */}
                             <div className="pay-deposit-breakdown">
                                 <div className="pay-deposit-breakdown__row pay-deposit-breakdown__row--now">
                                     <span>Due now (30% deposit)</span>
@@ -299,7 +344,7 @@ export const Payment = ({ theme, toggleTheme }) => {
                                     <p className="pay-submitted-msg__sub">We'll review your payment and reach out via WhatsApp within 24 hours.</p>
                                 </div>
                             ) : (
-                                <button className="pay-confirm-btn" onClick={handleConfirm} disabled={submitting}>
+                                <button className="pay-confirm-btn" onClick={handleConfirm} disabled={submitting || compressing}>
                                     {submitting ? "Submitting…" : <> Confirm Payment <ArrowRightIcon size={26} color="#111" /></>}
                                 </button>
                             )}

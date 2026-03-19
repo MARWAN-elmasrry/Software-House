@@ -106,7 +106,7 @@
                 }
             }
 
-            /* ── Vodafone Cash box ── */
+            /* ── Vodafone Cash / Instapay number box ── */
             .pay-vf-box {
                 background: linear-gradient(135deg,
                     color-mix(in srgb, #e60000 12%, transparent),
@@ -156,12 +156,12 @@
                 border-radius: 12px;
                 padding: 28px 20px;
                 cursor: pointer;
-                transition: border-color 0.2s, background 0.2s;
-                margin-bottom: 12px;
+                transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+                margin-bottom: 6px;
                 min-height: 140px;
                 box-sizing: border-box;
 
-                &:hover {
+                &:hover:not(.pay-upload-zone--compressing) {
                     border-color: var(--active-link);
                     background: color-mix(in srgb, var(--active-link) 4%, transparent);
                 }
@@ -170,6 +170,15 @@
                     border-style: solid;
                     border-color: var(--active-link);
                     padding: 12px;
+                }
+
+                &.pay-upload-zone--compressing {
+                    cursor: wait;
+                    pointer-events: none;
+                    border-style: solid;
+                    border-color: var(--active-link);
+                    background: color-mix(in srgb, var(--active-link) 5%, transparent);
+                    opacity: 0.8;
                 }
 
                 .pay-upload-placeholder {
@@ -189,6 +198,16 @@
                         font-weight: 400;
                         opacity: 0.6;
                     }
+                }
+
+                .pay-upload-spinner {
+                    width: 34px;
+                    height: 34px;
+                    border: 3px solid color-mix(in srgb, var(--active-link) 22%, transparent);
+                    border-top-color: var(--active-link);
+                    border-radius: 50%;
+                    animation: pay-spin 0.65s linear infinite;
+                    margin-bottom: 2px;
                 }
 
                 .pay-upload-preview {
@@ -213,7 +232,18 @@
                 }
             }
 
-            /* ── Add-ons ── */
+            .pay-img-error {
+                font-size: 1.3rem;
+                font-weight: 500;
+                color: #ff4d4d;
+                background-color: color-mix(in srgb, #ff4d4d 8%, transparent);
+                border: 1px solid color-mix(in srgb, #ff4d4d 28%, transparent);
+                border-radius: 8px;
+                padding: 8px 12px;
+                margin: 0 0 12px 0;
+            }
+
+            /* ── Add-ons (left panel cards) ── */
             .pay-addons {
                 display: flex;
                 flex-direction: column;
@@ -316,11 +346,12 @@
                 margin-bottom: 20px;
             }
 
+            /* ── Main plan row ── */
             .pay-plan-row {
                 display: flex;
                 align-items: center;
                 gap: 12px;
-                margin-bottom: 20px;
+                margin-bottom: 8px; /* tighter so addon rows sit snug below */
 
                 .pay-plan-icon {
                     width: 48px; height: 48px;
@@ -332,6 +363,50 @@
 
                 .pay-plan-name  { flex: 1; font-weight: 600; font-size: 2rem; }
                 .pay-plan-price { font-weight: 700; font-size: 2rem; }
+            }
+
+            /* ── Active addon lines in summary (right panel) ── */
+            .pay-addon-rows {
+                display: flex;
+                flex-direction: column;
+                gap: 0;
+                margin-bottom: 4px;
+                border-left: 2px solid color-mix(in srgb, var(--active-link) 30%, transparent);
+                margin-left: 12px;
+                padding-left: 12px;
+            }
+
+            .pay-addon-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 7px 0;
+                border-bottom: 1px dashed color-mix(in srgb, var(--bordercv-color) 60%, transparent);
+                animation: pay-addon-slide-in 0.2s ease-out;
+
+                &:last-child { border-bottom: none; }
+
+                .pay-addon-row__emoji {
+                    font-size: 1.6rem;
+                    flex-shrink: 0;
+                    width: 28px;
+                    text-align: center;
+                }
+
+                .pay-addon-row__name {
+                    flex: 1;
+                    font-size: 1.5rem;
+                    font-weight: 500;
+                    color: var(--text-color);
+                    opacity: 0.75;
+                }
+
+                .pay-addon-row__price {
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    color: var(--active-link);
+                    flex-shrink: 0;
+                }
             }
 
             .pay-summary-divider { height: 1px; background-color: var(--bordercv-color); margin: 16px 0; }
@@ -425,7 +500,7 @@
                 }
             }
 
-            /* ── Messages ── */
+            /* ── Errors ── */
             .pay-error {
                 font-size: 1.4rem; font-weight: 500;
                 color: #ff4d4d;
@@ -444,9 +519,9 @@
                 border-radius: 12px;
                 margin-top: 20px;
 
-                .pay-submitted-msg__icon { font-size: 2.4rem; color: var(--active-link); font-weight: 800; margin-bottom: 8px; }
+                .pay-submitted-msg__icon  { font-size: 2.4rem; color: var(--active-link); font-weight: 800; margin-bottom: 8px; }
                 .pay-submitted-msg__title { font-size: 1.8rem; font-weight: 700; color: var(--active-link); margin: 0 0 6px 0; }
-                .pay-submitted-msg__sub { font-size: 1.3rem; color: var(--text-color); opacity: 0.65; margin: 0; line-height: 1.6; }
+                .pay-submitted-msg__sub   { font-size: 1.3rem; color: var(--text-color); opacity: 0.65; margin: 0; line-height: 1.6; }
             }
 
             .pay-confirm-btn {
@@ -482,6 +557,16 @@
             }
         }
     }
+}
+
+/* ── Keyframes ───────────────────────────────────────────── */
+@keyframes pay-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pay-addon-slide-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Responsive ─────────────────────────────────────────── */
@@ -521,6 +606,13 @@
                     .pay-deposit-notice__sub   { font-size: 1.2rem; }
                 }
 
+                .pay-upload-zone {
+                    .pay-upload-placeholder { font-size: 1.3rem; }
+                    .pay-upload-spinner     { width: 28px; height: 28px; }
+                }
+
+                .pay-img-error { font-size: 1.2rem; }
+
                 .pay-addon-card {
                     padding: 14px;
                     .pay-addon-info .pay-addon-label { font-size: 1.4rem; }
@@ -541,6 +633,12 @@
                 .pay-error { font-size: 1.3rem; }
                 .pay-project-section .pay-input-wrap .pay-input { font-size: 1.4rem; }
                 .pay-ssl { font-size: 1.2rem; }
+
+                .pay-addon-row {
+                    .pay-addon-row__name  { font-size: 1.3rem; }
+                    .pay-addon-row__price { font-size: 1.3rem; }
+                }
+
                 .pay-deposit-breakdown .pay-deposit-breakdown__row { font-size: 1.3rem; }
                 .pay-deposit-breakdown .pay-deposit-breakdown__row--now strong { font-size: 1.5rem; }
             }
@@ -558,6 +656,14 @@
                 .pay-input-wrap .pay-input   { font-size: 1.4rem; }
                 .pay-vf-box .pay-vf-box__number { font-size: 2rem; }
                 .pay-vf-box .pay-vf-box__amount { font-size: 1.3rem; strong { font-size: 1.5rem; } }
+
+                .pay-upload-zone {
+                    padding: 22px 16px;
+                    .pay-upload-placeholder { font-size: 1.2rem; }
+                    .pay-upload-spinner     { width: 26px; height: 26px; }
+                }
+
+                .pay-img-error { font-size: 1.1rem; }
 
                 .pay-addon-card {
                     flex-direction: column;
@@ -582,6 +688,11 @@
                 .pay-section-badge { font-size: 0.9rem; }
                 .pay-error { font-size: 1.2rem; }
                 .pay-project-section .pay-input-wrap .pay-input { font-size: 1.3rem; }
+
+                .pay-addon-row {
+                    .pay-addon-row__name  { font-size: 1.2rem; }
+                    .pay-addon-row__price { font-size: 1.2rem; }
+                }
             }
         }
     }
