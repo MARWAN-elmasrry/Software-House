@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Blog } from './Pages/blog/blog';
 import { Payment } from './Pages/payment/pay';
 import { Contact } from './Pages/contact/contact';
-import Admin from './Pages/adnim/admin';
+import Admin from './Pages/admin/admin';
 
 export const App = () => {
 
