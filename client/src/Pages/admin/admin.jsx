@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "./admin.css";
 import { AdminBlog } from "./AdminBlog";
 import { AdminProjects } from "./AdminProjects";
-import { AdminUsers } from "./AdminUsers";
+import { AdminUsers } from "./Adminusers";
 import { AdminProvider, useAdmin } from "../../context/AdminContext";
 import { loginAdmin } from "../../api/service/adminAuthServ";
 import { GetContact, getStats } from "../../api/service/adminServ";
