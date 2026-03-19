@@ -4,6 +4,13 @@
   "installCommand": "cd client && npm install",
   "framework": "vite",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/api/(.*)",
+      "destination": "http://91.99.172.131:3000/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
   ]
 }
