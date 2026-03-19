@@ -6,7 +6,7 @@ import {
   deleteAdmin,
   toggleAdminStatus,
 } from "../../api/service/adminServ";
-import "./adminUsers.css";
+import "./Adminusers.css";
 
 const AVAILABLE_SECTIONS = ["web", "ai", "3d", "embedded"];
 
