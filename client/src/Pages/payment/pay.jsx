@@ -22,17 +22,71 @@ const getTodayFormatted = () => new Date().toLocaleDateString("en-US", { month: 
 
 const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", mobile: "📱 Mobile", embedded: "🔌 Embedded", "3d": "🎲 3D" };
 
-const ADDONS = {
-    web:      [{ key: "mobileAddon", label: "📱 Mobile App",       price: 5000,  description: "Add a full React Native / Flutter mobile app · Vodafone Cash / Instapay" },  { key: "aiAddon",     label: "🤖 AI Integration",  price: 10000, description: "Embed AI features — chatbot, recommendations, or NLP · Vodafone Cash / Instapay" }],
-    ai:       [{ key: "webAddon",    label: "🌐 Web Project",      price: 15000, description: "Pair your AI solution with a complete web platform · Vodafone Cash / Instapay" },                  { key: "mobileAddon", label: "📱 Mobile App",       price: 5000,  description: "Ship your AI features inside a native mobile app · Vodafone Cash / Instapay" }],
-    mobile:   [{ key: "webAddon",    label: "🌐 Web Project",      price: 15000, description: "Launch a web version alongside your mobile app · Vodafone Cash / Instapay" },                      { key: "aiAddon",     label: "🤖 AI Integration",  price: 10000, description: "Supercharge your mobile app with smart AI capabilities · Vodafone Cash / Instapay" }],
-    embedded: [{ key: "webAddon",    label: "🌐 Web Dashboard",    price: 15000, description: "Build a web interface to monitor and control your embedded system · Vodafone Cash / Instapay" },   { key: "mobileAddon", label: "📱 Mobile Control",   price: 5000,  description: "Add a mobile app to remotely control your hardware · Vodafone Cash / Instapay" }],
-    "3d":     [{ key: "webAddon",    label: "🌐 Web Integration",  price: 15000, description: "Embed your 3D experience into a full custom web platform · Vodafone Cash / Instapay" },            { key: "mobileAddon", label: "📱 Mobile Version",   price: 5000,  description: "Bring your 3D experience to iOS and Android · Vodafone Cash / Instapay" }],
-};
-
 const VODAFONE_CASH_NUMBER = "01012106005";
 const MAX_B64_BYTES        = 2 * 1024 * 1024;
 const DISCOUNT_AMOUNT      = 5000;
+
+// Tier mapping - maps plan names to their tier level
+const TIER_MAP = {
+    // Web tiers
+    "Easy": "starter",
+    "Medium": "pro", 
+    "Advanced": "enterprise",
+    // AI tiers
+    "AI Starter": "starter",
+    "AI Pro": "pro",
+    "AI Enterprise": "enterprise",
+    // Mobile tiers
+    "Mobile Starter": "starter",
+    "Mobile Pro": "pro",
+    "Mobile Enterprise": "enterprise"
+};
+
+// Base prices for each tier and section (before discount)
+const TIER_PRICES = {
+    web: { starter: 15000, pro: 30000, enterprise: 40000 },
+    ai: { starter: 30000, pro: 50000, enterprise: 70000 },
+    mobile: { starter: 20000, pro: 40000, enterprise: 65000 }
+};
+
+// Generate addons based on the selected plan's tier
+const getAddonsForPlan = (planName, planSection) => {
+    const tier = TIER_MAP[planName] || "starter";
+    const addons = [];
+
+    // Add other sections as addons
+    if (planSection !== "web") {
+        addons.push({
+            key: "webAddon",
+            label: tier === "starter" ? "🌐 Web Easy" : tier === "pro" ? "🌐 Web Medium" : "🌐 Web Advanced",
+            originalPrice: TIER_PRICES.web[tier],
+            price: TIER_PRICES.web[tier] - DISCOUNT_AMOUNT,
+            description: "Add a complete web platform · Vodafone Cash / Instapay"
+        });
+    }
+
+    if (planSection !== "mobile") {
+        addons.push({
+            key: "mobileAddon",
+            label: tier === "starter" ? "📱 Mobile Starter" : tier === "pro" ? "📱 Mobile Pro" : "📱 Mobile Enterprise",
+            originalPrice: TIER_PRICES.mobile[tier],
+            price: TIER_PRICES.mobile[tier] - DISCOUNT_AMOUNT,
+            description: "Add a full React Native / Flutter mobile app · Vodafone Cash / Instapay"
+        });
+    }
+
+    if (planSection !== "ai") {
+        addons.push({
+            key: "aiAddon",
+            label: tier === "starter" ? "🤖 AI Starter" : tier === "pro" ? "🤖 AI Pro" : "🤖 AI Enterprise",
+            originalPrice: TIER_PRICES.ai[tier],
+            price: TIER_PRICES.ai[tier] - DISCOUNT_AMOUNT,
+            description: "Embed AI features — chatbot, recommendations, or NLP · Vodafone Cash / Instapay"
+        });
+    }
+
+    return addons;
+};
 
 const compressImageToBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -68,7 +122,10 @@ const AddonCard = ({ addon, active, onToggle }) => (
             <span className="pay-addon-desc">{addon.description}</span>
         </div>
         <div className="pay-addon-right">
-            <span className="pay-addon-price">+{formatPrice(addon.price)}</span>
+            <div className="pay-addon-prices">
+                <span className="pay-addon-price-original">+{formatPrice(addon.originalPrice)}</span>
+                <span className="pay-addon-price">+{formatPrice(addon.price)}</span>
+            </div>
             <div className={`pay-addon-toggle ${active ? "pay-addon-toggle--on" : ""}`}>
                 <div className="pay-addon-toggle-dot" />
             </div>
@@ -98,7 +155,9 @@ export const Payment = ({ theme, toggleTheme }) => {
         features: ["Basic UI/UX Design", "Frontend implementation", "Weekly updates", "Email Support"],
     };
 
-    const sectionAddons = ADDONS[selectedPlan.section] ?? [];
+    // Generate addons dynamically based on the selected plan's tier
+    const sectionAddons = getAddonsForPlan(selectedPlan.name, selectedPlan.section);
+    
     const [addonState, setAddonState] = useState(
         Object.fromEntries(sectionAddons.map((a) => [a.key, false]))
     );
