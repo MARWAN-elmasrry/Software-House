@@ -13,6 +13,26 @@
 
             animation: fadeUp 0.7s ease both;
 
+            /* ── Help CTA Button ── */
+.help-cta-button {
+    padding: 16px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: 2px solid var(--logo-text-color);
+    background: transparent;
+    color: var(--logo-text-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.help-cta-button:hover {
+    background: var(--logo-text-color);
+    color: var(--background-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--logo-text-color) 30%, transparent);
+}
+
             & h1 {
                 font-size: clamp(2.4rem, 5vw, 3.5rem);
                 font-weight: 800;

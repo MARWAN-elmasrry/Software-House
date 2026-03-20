@@ -210,7 +210,21 @@ export const Package = ({ theme, toggleTheme }) => {
                         <div className="pack-head">
                             <h1>Tailored Software Solutions <span>for Every Stage</span></h1>
                             <p>Choose the specialized tech service package that fits your business needs. Transparent pricing, no hidden fees.</p>
-                            <span className="section-tag" style={{ marginTop: 100 }}>WEB DEVELOPMENT</span>
+                            
+                            {/* ══ HELP BUTTON ══ */}
+                            <div style={{ marginTop: "40px", marginBottom: "60px", textAlign: "center" }}>
+                              <Link 
+                                  to="/contact"
+                                  style={{ textDecoration: "none" }}
+                                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                              >
+                                  <button className="help-cta-button">
+                                      Not Sure What You Need? Let's Talk →
+                                  </button>
+                              </Link>
+                            </div>
+
+                            <span className="section-tag" style={{ marginTop: 40 }}>WEB DEVELOPMENT</span>
                         </div>
 
                         <div className="cards">
@@ -305,8 +319,18 @@ export const Package = ({ theme, toggleTheme }) => {
                         <div className="contact-section" ref={contactRef}>
                             <div className="contact-head">
                                 <span className="section-tag">GET IN TOUCH</span>
-                                <h2>Tell Us About <span>{formType === "embedded" ? "Your Embedded Project" : "Your 3D Project"}</span></h2>
-                                <p>Share your idea and we'll get back to you with a custom quote within 24 hours.</p>
+                                <h2>Tell Us About <span>
+                                    {formType === "embedded" 
+                                        ? "Your Embedded Project" 
+                                        : formType === "help" 
+                                        ? "Your Needs" 
+                                        : "Your 3D Project"}
+                                </span></h2>
+                                <p>
+                                    {formType === "help" 
+                                        ? "Not sure which package is right for you? Tell us about your project and we'll help you find the perfect solution."
+                                        : "Share your idea and we'll get back to you with a custom quote within 24 hours."}
+                                </p>
                             </div>
 
                             {formSent ? (
@@ -330,7 +354,13 @@ export const Package = ({ theme, toggleTheme }) => {
                                     <div className="form-group">
                                         <label>Tell us about your project</label>
                                         <textarea
-                                            placeholder={formType === "embedded" ? "Describe your embedded system, hardware requirements, protocols, and timeline..." : "Describe your 3D project, goals, timeline, and any references..."}
+                                            placeholder={
+                                                formType === "embedded" 
+                                                    ? "Describe your embedded system, hardware requirements, protocols, and timeline..." 
+                                                    : formType === "help"
+                                                    ? "Tell us about your project goals, timeline, budget range, and any specific requirements..."
+                                                    : "Describe your 3D project, goals, timeline, and any references..."
+                                            }
                                             rows={5} value={formData.message}
                                             onChange={(e) => setFormData({ ...formData, message: e.target.value })} required
                                         />

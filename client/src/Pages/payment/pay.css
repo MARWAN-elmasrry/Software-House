@@ -351,7 +351,7 @@
                 display: flex;
                 align-items: center;
                 gap: 12px;
-                margin-bottom: 8px; /* tighter so addon rows sit snug below */
+                margin-bottom: 12px;
 
                 .pay-plan-icon {
                     width: 48px; height: 48px;
@@ -361,8 +361,58 @@
                     flex-shrink: 0;
                 }
 
-                .pay-plan-name  { flex: 1; font-weight: 600; font-size: 2rem; }
-                .pay-plan-price { font-weight: 700; font-size: 2rem; }
+                .pay-plan-details {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+
+                .pay-plan-name  { font-weight: 600; font-size: 2rem; }
+                
+                .pay-plan-price-wrapper {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .pay-plan-price-original {
+                    font-size: 1.6rem;
+                    font-weight: 600;
+                    color: var(--text-color);
+                    opacity: 0.4;
+                    text-decoration: line-through;
+                    text-decoration-thickness: 2px;
+                }
+
+                .pay-plan-price { 
+                    font-weight: 800; 
+                    font-size: 2.2rem; 
+                    color: var(--active-link);
+                }
+            }
+
+            /* ── Discount badge ── */
+            .pay-discount-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: linear-gradient(135deg, 
+                    color-mix(in srgb, var(--active-link) 15%, transparent),
+                    color-mix(in srgb, var(--active-link) 8%, transparent)
+                );
+                border: 1.5px solid var(--active-link);
+                border-radius: 8px;
+                padding: 8px 14px;
+                margin-bottom: 16px;
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: var(--active-link);
+                animation: pay-discount-pulse 2s ease-in-out infinite;
+
+                span {
+                    letter-spacing: 0.02em;
+                }
             }
 
             /* ── Active addon lines in summary (right panel) ── */
@@ -426,7 +476,20 @@
                 margin-top: 4px;
 
                 .pay-total-label { font-weight: 700; font-size: 2rem; }
-                .pay-total-value { font-weight: 800; font-size: 2.4rem; }
+                .pay-total-value { font-weight: 800; font-size: 2.4rem; color: var(--active-link); }
+            }
+
+            /* ── Savings notice ── */
+            .pay-savings-notice {
+                text-align: center;
+                font-size: 1.3rem;
+                font-weight: 600;
+                color: var(--active-link);
+                background: color-mix(in srgb, var(--active-link) 8%, transparent);
+                border-radius: 8px;
+                padding: 10px 14px;
+                margin-top: 12px;
+                letter-spacing: 0.02em;
             }
 
             /* ── Deposit breakdown ── */
@@ -569,6 +632,15 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes pay-discount-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--active-link) 30%, transparent);
+    }
+    50% {
+        box-shadow: 0 0 0 4px color-mix(in srgb, var(--active-link) 0%, transparent);
+    }
+}
+
 /* ── Responsive ─────────────────────────────────────────── */
 
 @media (max-width: 1024px) {
@@ -624,12 +696,16 @@
             .pay-summary {
                 padding: 20px;
 
-                .pay-summary-title, .pay-plan-name, .pay-plan-price,
+                .pay-summary-title, .pay-plan-name,
                 .pay-summary-label, .pay-summary-value,
                 .pay-total-label, .pay-confirm-btn { font-size: 1.6rem; }
 
+                .pay-plan-price { font-size: 1.9rem; }
+                .pay-plan-price-original { font-size: 1.4rem; }
                 .pay-total-value { font-size: 2rem; }
                 .pay-section-badge { font-size: 1rem; }
+                .pay-discount-badge { font-size: 1.2rem; }
+                .pay-savings-notice { font-size: 1.2rem; }
                 .pay-error { font-size: 1.3rem; }
                 .pay-project-section .pay-input-wrap .pay-input { font-size: 1.4rem; }
                 .pay-ssl { font-size: 1.2rem; }
@@ -680,12 +756,16 @@
             }
 
             .pay-summary {
-                .pay-summary-title, .pay-plan-name, .pay-plan-price,
+                .pay-summary-title, .pay-plan-name,
                 .pay-summary-label, .pay-summary-value,
                 .pay-total-label, .pay-confirm-btn { font-size: 1.4rem; }
 
+                .pay-plan-price { font-size: 1.7rem; }
+                .pay-plan-price-original { font-size: 1.2rem; }
                 .pay-total-value { font-size: 1.8rem; }
                 .pay-section-badge { font-size: 0.9rem; }
+                .pay-discount-badge { font-size: 1.1rem; padding: 6px 10px; }
+                .pay-savings-notice { font-size: 1.1rem; }
                 .pay-error { font-size: 1.2rem; }
                 .pay-project-section .pay-input-wrap .pay-input { font-size: 1.3rem; }
 

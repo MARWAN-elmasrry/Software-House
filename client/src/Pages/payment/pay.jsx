@@ -15,6 +15,7 @@ const UserIcon       = ({ size = 20, color = "currentColor" }) => (<svg width={s
 const PhoneIcon      = ({ size = 20, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.08 6.08l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z" /></svg>);
 const UploadIcon     = ({ size = 24, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>);
 const InfoIcon       = ({ size = 18, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>);
+const TagIcon        = ({ size = 20, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>);
 
 const formatPrice       = (num) => "$" + num.toLocaleString("en-US", { minimumFractionDigits: 0 });
 const getTodayFormatted = () => new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -29,8 +30,9 @@ const ADDONS = {
     "3d":     [{ key: "webAddon",    label: "🌐 Web Integration",  price: 15000, description: "Embed your 3D experience into a full custom web platform · Vodafone Cash / Instapay" },            { key: "mobileAddon", label: "📱 Mobile Version",   price: 5000,  description: "Bring your 3D experience to iOS and Android · Vodafone Cash / Instapay" }],
 };
 
-const VODAFONE_CASH_NUMBER = "01XXXXXXXXX";
+const VODAFONE_CASH_NUMBER = "01012106005";
 const MAX_B64_BYTES        = 2 * 1024 * 1024;
+const DISCOUNT_AMOUNT      = 5000;
 
 const compressImageToBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -102,9 +104,10 @@ export const Payment = ({ theme, toggleTheme }) => {
     );
     const toggleAddon = (key) => setAddonState((prev) => ({ ...prev, [key]: !prev[key] }));
 
-    const subtotal    = selectedPlan.basePrice;
+    const subtotalOriginal = selectedPlan.basePrice;
+    const subtotalDiscounted = subtotalOriginal - DISCOUNT_AMOUNT;
     const addonsTotal = sectionAddons.reduce((sum, a) => sum + (addonState[a.key] ? a.price : 0), 0);
-    const total       = subtotal + addonsTotal;
+    const total       = subtotalDiscounted + addonsTotal;
     const deposit     = Math.round(total * 0.30);
 
     const handleScreenshot = async (e) => {
@@ -276,8 +279,19 @@ export const Payment = ({ theme, toggleTheme }) => {
                                         ? <img src={selectedPlan.icon} alt={selectedPlan.name} style={{ width: 30, height: 30 }} />
                                         : <LeafIcon size={30} color={ActiveLink} />}
                                 </div>
-                                <span className="pay-plan-name">{selectedPlan.name}</span>
-                                <span className="pay-plan-price">{formatPrice(subtotal)}</span>
+                                <div className="pay-plan-details">
+                                    <span className="pay-plan-name">{selectedPlan.name}</span>
+                                    <div className="pay-plan-price-wrapper">
+                                        <span className="pay-plan-price-original">{formatPrice(subtotalOriginal)}</span>
+                                        <span className="pay-plan-price">{formatPrice(subtotalDiscounted)}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* ── Discount badge ── */}
+                            <div className="pay-discount-badge">
+                                <TagIcon size={16} color="var(--active-link)" />
+                                <span>Limited Time: {formatPrice(DISCOUNT_AMOUNT)} OFF</span>
                             </div>
 
                             {/* ── Active addon rows — appear immediately under plan, above divider ── */}
@@ -298,7 +312,7 @@ export const Payment = ({ theme, toggleTheme }) => {
                             {/* ── Subtotal (updates as addons toggle) ── */}
                             <div className="pay-summary-row">
                                 <span className="pay-summary-label">Subtotal</span>
-                                <span className="pay-summary-value">{formatPrice(subtotal + addonsTotal)}</span>
+                                <span className="pay-summary-value">{formatPrice(subtotalDiscounted + addonsTotal)}</span>
                             </div>
 
                             <div className="pay-summary-divider" />
@@ -306,6 +320,10 @@ export const Payment = ({ theme, toggleTheme }) => {
                             <div className="pay-total-row">
                                 <span className="pay-total-label">Total Due</span>
                                 <span className="pay-total-value">{formatPrice(total)}</span>
+                            </div>
+
+                            <div className="pay-savings-notice">
+                                You're saving {formatPrice(DISCOUNT_AMOUNT)} with this offer!
                             </div>
 
                             <div className="pay-deposit-breakdown">
