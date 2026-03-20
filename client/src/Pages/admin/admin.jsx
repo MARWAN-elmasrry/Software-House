@@ -344,12 +344,6 @@ const LoginPage = ({ onSuccess }) => {
           {status === "success" && (
             <div className="login-feedback login-feedback--success">{message}</div>
           )}
-
-          <hr className="login-divider" />
-          <div className="login-meta">
-            superadmin: <code>admin</code> / <code>admin123</code>
-            &nbsp;·&nbsp; web+ai: <code>webadmin</code> / <code>web12345</code>
-          </div>
         </div>
       </div>
     </>
