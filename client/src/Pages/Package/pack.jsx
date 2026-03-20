@@ -7,6 +7,8 @@ import Advanced from "../../assets/advanced.png"
 import "./pack.css"
 import { Link } from "react-router-dom"
 
+const DISCOUNT_AMOUNT = 5000;
+
 /* ─── Web Plans ─────────────────────────────────────────── */
 const webPlans = [
     {
@@ -132,8 +134,11 @@ const mobilePlans = [
 
 const fmt = (n) => n.toLocaleString("en-US")
 
-/* ─── Generic Plan Card (no checkboxes) ─────────────────── */
+/* ─── Generic Plan Card (with discount) ─────────────────── */
 const PlanCard = ({ plan }) => {
+    const originalPrice = plan.basePrice;
+    const discountedPrice = originalPrice - DISCOUNT_AMOUNT;
+
     const passedPlan = {
         name:           plan.name,
         tagline:        plan.tagline,
@@ -156,7 +161,14 @@ const PlanCard = ({ plan }) => {
 
             <p className="card-tagline">{plan.tagline}</p>
 
-            <div className="card-price">{fmt(plan.basePrice)}</div>
+            <div className="card-price-container">
+                <div className="card-price-original">{fmt(originalPrice)}</div>
+                <div className="card-price">{fmt(discountedPrice)}</div>
+            </div>
+
+            <div className="card-discount-badge">
+                Save ${fmt(DISCOUNT_AMOUNT)}
+            </div>
 
             <Link
                 style={{ textDecoration: "none" }}
@@ -211,6 +223,12 @@ export const Package = ({ theme, toggleTheme }) => {
                             <h1>Tailored Software Solutions <span>for Every Stage</span></h1>
                             <p>Choose the specialized tech service package that fits your business needs. Transparent pricing, no hidden fees.</p>
                             
+                            {/* ══ LIMITED TIME OFFER BADGE ══ */}
+                            <div className="pack-limited-offer">
+                                <span className="pack-limited-offer__icon">🔥</span>
+                                <span className="pack-limited-offer__text">Limited Time: <strong>${fmt(DISCOUNT_AMOUNT)} OFF</strong> All Packages</span>
+                            </div>
+
                             {/* ══ HELP BUTTON ══ */}
                             <div style={{ marginTop: "40px", marginBottom: "60px", textAlign: "center" }}>
                               <Link 

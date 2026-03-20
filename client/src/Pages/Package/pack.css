@@ -13,25 +13,58 @@
 
             animation: fadeUp 0.7s ease both;
 
-            /* ── Help CTA Button ── */
-.help-cta-button {
-    padding: 16px 32px;
-    font-size: 1rem;
-    font-weight: 600;
-    border: 2px solid var(--logo-text-color);
-    background: transparent;
-    color: var(--logo-text-color);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
+            /* ── Limited Time Offer Badge ── */
+            .pack-limited-offer {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                background: linear-gradient(135deg, 
+                    color-mix(in srgb, var(--logo-text-color) 15%, transparent),
+                    color-mix(in srgb, var(--logo-text-color) 8%, transparent)
+                );
+                border: 2px solid var(--logo-text-color);
+                border-radius: 50px;
+                padding: 12px 24px;
+                margin-top: 24px;
+                animation: pack-offer-pulse 2s ease-in-out infinite;
 
-.help-cta-button:hover {
-    background: var(--logo-text-color);
-    color: var(--background-color);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px color-mix(in srgb, var(--logo-text-color) 30%, transparent);
-}
+                &__icon {
+                    font-size: 1.8rem;
+                }
+
+                &__text {
+                    font-size: 1.4rem;
+                    font-weight: 600;
+                    color: var(--text-color);
+                    letter-spacing: 0.02em;
+
+                    strong {
+                        color: var(--logo-text-color);
+                        font-weight: 800;
+                        font-size: 1.5rem;
+                    }
+                }
+            }
+
+            /* ── Help CTA Button ── */
+            .help-cta-button {
+                padding: 16px 32px;
+                font-size: 1rem;
+                font-weight: 600;
+                border: 2px solid var(--logo-text-color);
+                background: transparent;
+                color: var(--logo-text-color);
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .help-cta-button:hover {
+                background: var(--logo-text-color);
+                color: var(--background-color);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px color-mix(in srgb, var(--logo-text-color) 30%, transparent);
+            }
 
             & h1 {
                 font-size: clamp(2.4rem, 5vw, 3.5rem);
@@ -157,59 +190,58 @@
                     margin-bottom: 20px;
                 }
 
-                /* ── Price ── */
+                /* ── Price Container ── */
+                & .card-price-container {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                    margin-bottom: 10px;
+                }
+
+                /* ── Original Price (crossed out) ── */
+                & .card-price-original {
+                    font-size: clamp(1.2rem, 2vw, 1.6rem);
+                    font-weight: 600;
+                    color: var(--text-color);
+                    opacity: 0.4;
+                    text-decoration: line-through;
+                    text-decoration-thickness: 2px;
+                }
+
+                /* ── Discounted Price ── */
                 & .card-price {
-                    font-size: clamp(1.6rem, 3vw, 2.4rem);
+                    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
                     font-weight: 800;
-                    margin-bottom: 16px;
                     letter-spacing: -0.02em;
                     transition: transform 0.25s ease;
                     display: flex;
                     align-items: center;
                     flex-wrap: wrap;
                     gap: 6px;
+                    color: var(--logo-text-color);
                 }
 
                 &:hover .card-price {
                     transform: scale(1.04);
                 }
 
-                /* ── Mobile add-on checkbox ── */
-                & .mobile-addon {
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
+                /* ── Discount Badge ── */
+                & .card-discount-badge {
+                    display: inline-block;
+                    align-self: flex-start;
+                    background: linear-gradient(135deg, 
+                        color-mix(in srgb, var(--logo-text-color) 15%, transparent),
+                        color-mix(in srgb, var(--logo-text-color) 8%, transparent)
+                    );
+                    border: 1.5px solid var(--logo-text-color);
+                    border-radius: 20px;
+                    padding: 6px 14px;
+                    font-size: 0.9rem;
+                    font-weight: 700;
+                    color: var(--logo-text-color);
                     margin-bottom: 20px;
-                    cursor: pointer;
-                    padding: 10px 14px;
-                    border-radius: 10px;
-                    border: 1.5px dashed var(--logo-text-color);
-                    opacity: 0.6;
-                    transition: opacity 0.2s, background 0.2s;
-                    user-select: none;
-
-                    &:hover {
-                        opacity: 1;
-                        background: color-mix(in srgb, var(--logo-text-color) 6%, transparent);
-                    }
-
-                    & .mobile-checkbox {
-                        width: 17px;
-                        height: 17px;
-                        accent-color: var(--logo-text-color);
-                        cursor: pointer;
-                        flex-shrink: 0;
-                    }
-
-                    & .mobile-addon-text {
-                        font-size: 0.85rem;
-                        color: var(--text-color);
-                        opacity: 0.85;
-
-                        & strong {
-                            color: var(--logo-text-color);
-                        }
-                    }
+                    letter-spacing: 0.03em;
+                    animation: card-discount-shine 3s ease-in-out infinite;
                 }
 
                 /* ── CTA button ── */
@@ -697,6 +729,24 @@
     to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes pack-offer-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--logo-text-color) 30%, transparent);
+    }
+    50% {
+        box-shadow: 0 0 0 6px color-mix(in srgb, var(--logo-text-color) 0%, transparent);
+    }
+}
+
+@keyframes card-discount-shine {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.85;
+    }
+}
+
 /* ── Responsive ── */
 @media (max-width: 1100px) {
     .pack .pack-cont .cards {
@@ -716,6 +766,24 @@
 }
 
 @media (max-width: 768px) {
+    .pack .pack-cont .pack-head {
+        .pack-limited-offer {
+            padding: 10px 20px;
+
+            &__icon {
+                font-size: 1.5rem;
+            }
+
+            &__text {
+                font-size: 1.2rem;
+
+                strong {
+                    font-size: 1.3rem;
+                }
+            }
+        }
+    }
+
     .threed-card {
         padding: 40px 28px;
     }
@@ -744,6 +812,25 @@
 
         & .pack-cont .pack-head {
             margin-bottom: 50px;
+
+            .pack-limited-offer {
+                flex-direction: column;
+                gap: 6px;
+                padding: 10px 16px;
+
+                &__icon {
+                    font-size: 1.8rem;
+                }
+
+                &__text {
+                    font-size: 1.1rem;
+                    text-align: center;
+
+                    strong {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
         }
 
         & .pack-cont .cards {
@@ -754,6 +841,11 @@
 
                 &.recommended {
                     padding-top: 44px;
+                }
+
+                .card-discount-badge {
+                    font-size: 0.85rem;
+                    padding: 5px 12px;
                 }
             }
         }
@@ -772,7 +864,9 @@
     .pack .pack-cont .cards .card .rec-badge,
     .pack-section-divider,
     .threed-card,
-    .contact-section {
+    .contact-section,
+    .pack-limited-offer,
+    .card-discount-badge {
         animation: none;
         opacity: 1;
     }
