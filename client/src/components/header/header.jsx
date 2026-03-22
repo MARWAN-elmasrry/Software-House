@@ -29,7 +29,7 @@ export const Header = ({ onToggleTheme }) => {
         <div className="head-cont">
           <NavLink to="/" className="logo"  onClick={closeMenu}>
             <img src={Logo} alt="SoftWareHouseIMG" />
-            <h2>Software House</h2>
+            <h2>Software House dev</h2>
           </NavLink>
           
           <div className={`links ${isMenuOpen ? 'active' : ''}`}>
