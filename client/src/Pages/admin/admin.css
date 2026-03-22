@@ -1130,3 +1130,115 @@ nav {
   min-width: 34px;
   text-align: right;
 }
+
+/* ════════════════════════════════════════════
+   AB — Payment Screenshot Thumbnail
+════════════════════════════════════════════ */
+.ab-screenshot-wrap {
+  position: relative;
+  display: flex;
+  margin-top: 6px;
+  cursor: zoom-in;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--bordercv-color);
+  transition: border-color 0.2s;
+  justify-content: center;
+}
+.ab-screenshot-wrap:hover {
+  border-color: var(--logo-text-color);
+}
+.ab-screenshot-wrap:hover .ab-screenshot-overlay {
+  opacity: 1;
+}
+
+.ab-screenshot-thumb {
+  display: block;
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.ab-screenshot-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: "Rajdhani", sans-serif;
+  letter-spacing: 0.04em;
+  border-radius: 8px;
+  pointer-events: none;
+}
+.ab-screenshot-overlay svg {
+  stroke: #fff;
+}
+
+/* ════════════════════════════════════════════
+   AB — Lightbox
+════════════════════════════════════════════ */
+.ab-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: ab-lb-fade 0.18s ease-out;
+  padding: 20px;
+}
+
+.ab-lightbox__img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6);
+  cursor: default;
+  animation: ab-lb-scale 0.18s ease-out;
+}
+
+.ab-lightbox__close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  line-height: 1;
+  font-family: "Rajdhani", sans-serif;
+}
+.ab-lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+@keyframes ab-lb-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ab-lb-scale {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}

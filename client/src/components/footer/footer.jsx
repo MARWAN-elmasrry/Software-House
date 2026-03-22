@@ -14,7 +14,7 @@ export const Footer = () => {
                     <div className="left-foot">
                         <div className="logo">
                             <img src={Logo} alt="SoftWareHouseIMG" />
-                            <h1>Software House</h1>
+                            <h1>Softuuare House</h1>
                         </div>
                         <p>Premium software engineering services for forward-thinking enterprises. We don't just write code, we build legacies.</p>
                     </div>

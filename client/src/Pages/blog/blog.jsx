@@ -15,9 +15,9 @@ export const Blog = ({ theme, toggleTheme }) => {
       try {
         setLoading(true);
         const res = await getAllBlogs();
-        setProjects(res.data);
+        setProjects(Array.isArray(res) ? res : res.data ?? []);
       } catch (err) {
-        setError(err);
+        setError(err.message ?? "Something went wrong");
       } finally {
         setLoading(false);
       }

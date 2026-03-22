@@ -50,6 +50,28 @@ const renderAddonReadonly = (form) => {
   return <span style={{ marginLeft:8, fontSize:13, opacity:0.7 }}>{a.join("  ")}</span>;
 };
 
+// ─── Lightbox ─────────────────────────────────────────────
+const Lightbox = ({ src, onClose }) => {
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
+  return (
+    <div className="ab-lightbox" onClick={onClose}>
+      <button className="ab-lightbox__close" onClick={onClose}>✕</button>
+      <img
+        className="ab-lightbox__img"
+        src={src}
+        alt="Payment screenshot"
+        onClick={(e) => e.stopPropagation()}
+      />
+    </div>
+  );
+};
+
 // ─── Add Modal ────────────────────────────────────────────
 const AddModal = ({ form, onChange, onSave, onClose, allowedSections }) => {
   const addons = SECTION_ADDONS[form.section] ?? [];
@@ -111,81 +133,102 @@ const AddModal = ({ form, onChange, onSave, onClose, allowedSections }) => {
 };
 
 // ─── Edit Modal ───────────────────────────────────────────
-const EditModal = ({ form, onChange, onSave, onClose, isSuperAdmin }) => (
-  <div className="ab-overlay" onClick={onClose}>
-    <div className="ab-modal" onClick={(e) => e.stopPropagation()}>
-      <div className="ab-modal__header">
-        <h2 className="ab-modal__title">Edit Project</h2>
-        <button className="ab-modal__close" onClick={onClose}>✕</button>
-      </div>
-      <div className="ab-modal__body">
-        <div className="ab-field ab-field--readonly"><span>Section</span><p>{SECTION_LABELS[form.section] ?? form.section}</p></div>
-        <div className="ab-field ab-field--readonly"><span>Project Name</span><p>{form.name}</p></div>
-        <div className="ab-field ab-field--readonly"><span>Client</span><p>{form.client}</p></div>
-        <div className="ab-field ab-field--readonly"><span>Due Date</span><p>{form.due}</p></div>
-        <div className="ab-field ab-field--readonly">
-          <span>Price</span>
-          <p>{form.price != null ? `$${Number(form.price).toLocaleString("en-US")}` : "—"}{renderAddonReadonly(form)}</p>
-        </div>
+const EditModal = ({ form, onChange, onSave, onClose, isSuperAdmin }) => {
+  const [lightbox, setLightbox] = useState(false);
 
-        {/* Vodafone Cash payment info — superadmin only */}
-        {isSuperAdmin && (
-          <>
-            {form.senderName && (
-              <div className="ab-field ab-field--readonly"><span>VF Sender Name</span><p>{form.senderName}</p></div>
+  return (
+    <>
+      <div className="ab-overlay" onClick={onClose}>
+        <div className="ab-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="ab-modal__header">
+            <h2 className="ab-modal__title">Edit Project</h2>
+            <button className="ab-modal__close" onClick={onClose}>✕</button>
+          </div>
+          <div className="ab-modal__body">
+            <div className="ab-field ab-field--readonly"><span>Section</span><p>{SECTION_LABELS[form.section] ?? form.section}</p></div>
+            <div className="ab-field ab-field--readonly"><span>Project Name</span><p>{form.name}</p></div>
+            <div className="ab-field ab-field--readonly"><span>Client</span><p>{form.client}</p></div>
+            <div className="ab-field ab-field--readonly"><span>Due Date</span><p>{form.due}</p></div>
+            <div className="ab-field ab-field--readonly">
+              <span>Price</span>
+              <p>{form.price != null ? `$${Number(form.price).toLocaleString("en-US")}` : "—"}{renderAddonReadonly(form)}</p>
+            </div>
+
+            {/* Vodafone Cash / Instapay payment info — superadmin only */}
+            {isSuperAdmin && (
+              <>
+                {form.senderName && (
+                  <div className="ab-field ab-field--readonly"><span>VF Sender Name</span><p>{form.senderName}</p></div>
+                )}
+                {form.whatsappNumber && (
+                  <div className="ab-field ab-field--readonly"><span>WhatsApp</span><p>{form.whatsappNumber}</p></div>
+                )}
+                {form.depositAmount > 0 && (
+                  <div className="ab-field ab-field--readonly">
+                    <span>Deposit</span>
+                    <p>
+                      ${Number(form.depositAmount).toLocaleString("en-US")}
+                      <span style={{ marginLeft:8, fontSize:12, opacity:0.6 }}>
+                        {form.depositPaid ? "✅ Paid" : "⏳ Pending"}
+                      </span>
+                    </p>
+                  </div>
+                )}
+
+                {/* ── Payment screenshot with click-to-expand ── */}
+                {form.paymentScreenshot && (
+                  <div className="ab-field ab-field--readonly">
+                    <span>Payment Screenshot</span>
+                    <div className="ab-screenshot-wrap" onClick={() => setLightbox(true)} title="Click to view full size">
+                      <img
+                        src={form.paymentScreenshot}
+                        alt="Payment screenshot"
+                        className="ab-screenshot-thumb"
+                      />
+                      <div className="ab-screenshot-overlay">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                          <line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                        <span>View full size</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <label className="ab-field">
+                  <span>Deposit Status</span>
+                  <select value={form.depositPaid ? "true" : "false"} onChange={(e) => onChange("depositPaid", e.target.value === "true")}>
+                    <option value="false">⏳ Pending</option>
+                    <option value="true">✅ Paid</option>
+                  </select>
+                </label>
+              </>
             )}
-            {form.whatsappNumber && (
-              <div className="ab-field ab-field--readonly"><span>WhatsApp</span><p>{form.whatsappNumber}</p></div>
-            )}
-            {form.depositAmount > 0 && (
-              <div className="ab-field ab-field--readonly">
-                <span>Deposit</span>
-                <p>
-                  ${Number(form.depositAmount).toLocaleString("en-US")}
-                  <span style={{ marginLeft:8, fontSize:12, opacity:0.6 }}>
-                    {form.depositPaid ? "✅ Paid" : "⏳ Pending"}
-                  </span>
-                </p>
-              </div>
-            )}
-            {form.paymentScreenshot && (
-              <div className="ab-field ab-field--readonly">
-                <span>Payment Screenshot</span>
-                <img
-                  src={form.paymentScreenshot}
-                  alt="Payment screenshot"
-                  style={{ maxWidth:"100%", maxHeight:180, borderRadius:8, marginTop:6, objectFit:"contain", border:"1px solid var(--bordercv-color)" }}
-                />
-              </div>
-            )}
+
             <label className="ab-field">
-              <span>Deposit Status</span>
-              <select value={form.depositPaid ? "true" : "false"} onChange={(e) => onChange("depositPaid", e.target.value === "true")}>
-                <option value="false">⏳ Pending</option>
-                <option value="true">✅ Paid</option>
+              <span>Status</span>
+              <select value={form.status} onChange={(e) => onChange("status", e.target.value)}>
+                <option value="active">Active</option><option value="review">In Review</option><option value="done">Done</option>
               </select>
             </label>
-          </>
-        )}
+            <label className="ab-field">
+              <span>Progress ({form.progress}%)</span>
+              <input type="range" min="0" max="100" value={form.progress} onChange={(e) => onChange("progress", Number(e.target.value))} />
+            </label>
+          </div>
+          <div className="ab-modal__footer">
+            <button className="ab-btn ab-btn--ghost" onClick={onClose}>Cancel</button>
+            <button className="ab-btn ab-btn--primary" onClick={onSave}>Save Changes</button>
+          </div>
+        </div>
+      </div>
 
-        <label className="ab-field">
-          <span>Status</span>
-          <select value={form.status} onChange={(e) => onChange("status", e.target.value)}>
-            <option value="active">Active</option><option value="review">In Review</option><option value="done">Done</option>
-          </select>
-        </label>
-        <label className="ab-field">
-          <span>Progress ({form.progress}%)</span>
-          <input type="range" min="0" max="100" value={form.progress} onChange={(e) => onChange("progress", Number(e.target.value))} />
-        </label>
-      </div>
-      <div className="ab-modal__footer">
-        <button className="ab-btn ab-btn--ghost" onClick={onClose}>Cancel</button>
-        <button className="ab-btn ab-btn--primary" onClick={onSave}>Save Changes</button>
-      </div>
-    </div>
-  </div>
-);
+      {/* Lightbox — rendered outside the modal so it covers everything */}
+      {lightbox && <Lightbox src={form.paymentScreenshot} onClose={() => setLightbox(false)} />}
+    </>
+  );
+};
 
 // ─── Main ─────────────────────────────────────────────────
 export const AdminProjects = () => {
@@ -279,7 +322,11 @@ export const AdminProjects = () => {
           <h1 className="ab__title">Projects</h1>
           <p className="ab__subtitle">{visibleProjects.length} total · {visibleProjects.filter((p) => p.status === "active").length} active</p>
         </div>
-        <button className="ab-btn ab-btn--primary" onClick={openAdd}><PlusIcon /> New Project</button>
+        {isSuperAdmin && (
+          <button className="ab-btn ab-btn--primary" onClick={openAdd}>
+            <PlusIcon /> New Project
+          </button>
+        )}
       </div>
 
       <div className="ap-tabs">
@@ -309,7 +356,6 @@ export const AdminProjects = () => {
             <span className={`ap-section-badge ap-section-badge--${p.section}`}>{SECTION_LABELS[p.section] ?? p.section}</span>
             <span className="ap-table__price">{p.price != null ? `$${Number(p.price).toLocaleString("en-US")}` : "—"}</span>
             <span className="ap-table__mobile">{renderAddonCell(p)}</span>
-            {/* Deposit status — superadmin only */}
             {isSuperAdmin && (
               <span className="ap-table__deposit">
                 {p.depositAmount > 0
@@ -326,19 +372,14 @@ export const AdminProjects = () => {
               <button className="ab-icon-btn" onClick={() => openEdit(p)} title="Edit">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               </button>
-              <button className="ab-icon-btn ab-icon-btn--danger" onClick={() => setDeleteId(p._id)} title="Delete">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-              </button>
+              {isSuperAdmin && (
+                <button className="ab-icon-btn ab-icon-btn--danger" onClick={() => setDeleteId(p._id)} title="Delete">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
+              )}
             </div>
           </div>
         ))}
-
-        {visibleProjects.length === 0 && (
-          <div className="ab__empty">
-            <p>No {activeTab === "all" ? "" : SECTION_LABELS[activeTab]} projects yet.</p>
-            <button className="ab-btn ab-btn--primary" onClick={openAdd}><PlusIcon /> Add your first project</button>
-          </div>
-        )}
       </div>
 
       {modal === "add"  && <AddModal form={form} onChange={handleField} onSave={handleSave} onClose={close} allowedSections={allowedSections} />}
