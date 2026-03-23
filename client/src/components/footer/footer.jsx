@@ -44,7 +44,7 @@ export const Footer = () => {
                     </div>
                 </div>
             </div>
-            <h3>© 2025 Software House. All rights reserved.</h3>
+            <h3>© {new Date().getFullYear()} Softuuare House. All rights reserved.</h3>
         </footer>
     )
 }
