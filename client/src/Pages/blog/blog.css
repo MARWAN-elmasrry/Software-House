@@ -320,3 +320,110 @@
         }
     }
 }
+.loader-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 4rem 0;
+}
+
+.loader {
+  height: 50px;
+  width: 90px;
+  aspect-ratio: 2;
+  border-bottom: 3px solid #0000;
+  background: 
+    linear-gradient(90deg, var(--active-link) 50%, #0000 0)
+    -25% 100% / 50% 3px repeat-x border-box;
+  position: relative;
+  animation: l3-0 0.75s linear infinite;
+}
+
+.loader::before {
+  content: "";
+  position: absolute;
+  inset: auto 42.5% 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--active-link);
+  animation: l3-1 0.75s cubic-bezier(0, 900, 1, 900) infinite;
+}
+
+@keyframes l3-0 {
+  to { background-position: -125% 100%; }
+}
+
+@keyframes l3-1 {
+  0%,  2% { bottom: 0%; }
+  98%, to  { bottom: 0.1%; }
+}
+
+/* ── Error State ── */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+ 
+.error-icon {
+  font-size: 2.5rem;
+  color: var(--active-link, #84cc16);
+  opacity: 0.8;
+}
+ 
+.error-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+ 
+.error-msg {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.5;
+  font-weight: 500;
+  max-width: 320px;
+}
+ 
+.error-retry {
+  margin-top: 0.5rem;
+  padding: 0.5rem 2.5rem;
+  border: 2px solid var(--active-link, #84cc16);
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+ 
+.error-retry:hover {
+  background-color: var(--active-link, #84cc16);
+  color: var(--background-color);
+  transform: translateY(-2px);
+}
+ 
+.error-retry:active {
+  transform: translateY(0);
+}
+ 
+/* ── Empty State ── */
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 4rem 0;
+  opacity: 0.5;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
