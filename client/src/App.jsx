@@ -20,6 +20,45 @@ export const App = () => {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // ─── Disable DevTools ───────────────────────────────────────────────
+  useEffect(() => {
+    // Disable right-click
+    const handleContextMenu = (e) => e.preventDefault();
+
+    // Disable F12, Ctrl+Shift+I/J/C, Ctrl+U
+    const handleKeyDown = (e) => {
+      if (
+        e.key === 'F12' ||
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) ||
+        (e.ctrlKey && e.key === 'U')
+      ) {
+        e.preventDefault();
+      }
+    };
+
+    // Detect if DevTools is open and redirect/blur
+    const detectDevTools = () => {
+      const threshold = 160;
+      if (
+        window.outerWidth - window.innerWidth > threshold ||
+        window.outerHeight - window.innerHeight > threshold
+      ) {
+        document.body.innerHTML = ''; // Clear page if DevTools detected
+      }
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('keydown', handleKeyDown);
+    const devToolsInterval = setInterval(detectDevTools, 1000);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('keydown', handleKeyDown);
+      clearInterval(devToolsInterval);
+    };
+  }, []);
+  // ────────────────────────────────────────────────────────────────────
+
   const toggleTheme = () => setTheme(t => (t === 'white' ? 'dark' : 'white'));
 
   return (
