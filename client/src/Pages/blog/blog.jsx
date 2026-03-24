@@ -35,7 +35,7 @@ export const Blog = ({ theme, toggleTheme }) => {
               <div className="blog-head">
                 <h1>LETS SEE WHERE WE GO TO THE POINT</h1>
                 <div className="btn">
-                  <button>CV</button>
+                  <button>Resume</button>
                 </div>
                 <img src={Linesd} />
               </div>
