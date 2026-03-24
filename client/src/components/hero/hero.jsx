@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import './hero.css'
 import Git from '../../assets/git.png';
+import Modl from '../../assets/modl.png';
+import Gaddah from '../../assets/gaddah.png';
 import { Link } from 'react-router-dom';
 
 export const Hero = () => {
@@ -183,10 +185,12 @@ export const Hero = () => {
                 <div className="trustby">
                     <h3>Trust by</h3>
                     <div className="icons">
-                        <img src={Git} alt="Git" />
-                        <img src={Git} alt="Git" />
-                        <img src={Git} alt="Git" />
-                        <img src={Git} alt="Git" />
+                        <Link to="https://modl.work/">
+                            <img src={Modl} alt="Modl" />
+                        </Link>
+                        <Link to="https://gaddha.vercel.app/">
+                            <img src={Gaddah} alt="Gaddah" />
+                        </Link>
                     </div>
                 </div>
         </div>
