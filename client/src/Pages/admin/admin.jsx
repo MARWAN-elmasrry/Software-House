@@ -434,6 +434,7 @@ const Dashboard = () => {
       <div className="contact-table">
         <div className="table-row table-row--head">
           <span className="table-cell">Name</span>
+          <span className="table-cell">Phone</span>
           <span className="table-cell">Email</span>
           <span className="table-cell">Subject</span>
         </div>
@@ -447,13 +448,20 @@ const Dashboard = () => {
             No contacts yet.
           </div>
         )}
-        {tableRows.map((row, i) => (
-          <div key={i} className="table-row">
-            <span className="table-cell">{row.name}</span>
-            <span className="table-cell">{row.email}</span>
-            <span className="table-cell">{row.subject}</span>
-          </div>
-        ))}
+        {tableRows.map((row, i) => {
+          const phoneMatch = row.name.match(/\(([^)]+)\)/);
+          const phone = phoneMatch ? phoneMatch[1] : "—";
+          const cleanName = row.name.replace(/\s*\([^)]*\)/, "").trim();
+                
+          return (
+            <div key={i} className="table-row">
+              <span className="table-cell">{cleanName}</span>
+              <span className="table-cell">{phone}</span>
+              <span className="table-cell">{row.email}</span>
+              <span className="table-cell">{row.subject}</span>
+            </div>
+          );
+        })}
       </div>
     </>
   );

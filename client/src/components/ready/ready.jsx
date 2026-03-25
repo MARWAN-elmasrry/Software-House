@@ -18,12 +18,13 @@ export const Ready = () =>{
                     <div className="ready-card">
                         <h2>Ready to build something extraordinary?</h2>
                         <p>Let's discuss how we can help you architect the next generation of your software infrastructure.</p>
-                        
                         <div className="ready-buttons">
-                            <button className="schedule-btn">Schedule a Consultation</button>
-                             <Link to="/pack" onClick={closeMenu}>
+                            <Link to="/contact" onClick={closeMenu}>
+                                <button className="schedule-btn">Schedule a Consultation</button>
+                            </Link>
+                            <Link to="/pack" onClick={closeMenu}>
                                 <button className="view-services-btn">View Services</button>
-                             </Link>
+                            </Link>
                         </div>
                     </div>
                 </div>
