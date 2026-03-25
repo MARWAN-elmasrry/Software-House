@@ -36,6 +36,7 @@ body {
   color: var(--text-color);
   margin: 0;
   transition: background-color 0.25s ease, color 0.25s ease;
+  cursor:default;
 }
 ::selection {
   background: transparent;

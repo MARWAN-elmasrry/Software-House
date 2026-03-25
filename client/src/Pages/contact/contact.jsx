@@ -8,7 +8,7 @@ import { PostContact } from "../../api/service/contactServ.js"
 import "./contact.css"
 
 export const Contact = ({ theme, toggleTheme }) => {
-  const [form, setForm] = useState({ name: "", email: "", subject: "" })
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "" })
   const [status, setStatus] = useState(null) // "success" | "error" | null
   const [loading, setLoading] = useState(false)
 
@@ -22,9 +22,13 @@ export const Contact = ({ theme, toggleTheme }) => {
     setStatus(null)
 
     try {
-      await PostContact(form)
+      const payload = {
+        ...form,
+        name: `${form.name} (${form.phone})`,
+      }
+      await PostContact(payload)
       setStatus("success")
-      setForm({ name: "", email: "", subject: "" })
+      setForm({ name: "", email: "", phone: "", subject: "" })
     } catch (error) {
       setStatus("error")
     } finally {
@@ -54,6 +58,19 @@ export const Contact = ({ theme, toggleTheme }) => {
                       type="text"
                       name="name"
                       value={form.name}
+                      onChange={handleChange}
+                      placeholder=""
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="phone">Phone Number</label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      name="phone"
+                      value={form.phone}
                       onChange={handleChange}
                       placeholder=""
                       required
