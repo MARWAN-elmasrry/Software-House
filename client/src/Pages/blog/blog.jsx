@@ -5,6 +5,30 @@ import Linesd from "../../assets/linesd.png";
 import { getAllBlogs } from "../../api/service/blogServ";
 import "./blog.css";
 
+const CardImage = ({ src, alt }) => {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <div className="card-img">
+      {!imgLoaded && !imgError && (
+        <div className="img-skeleton" />
+      )}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setImgLoaded(true)}
+        onError={() => setImgError(true)}
+        style={{ display: imgLoaded ? "block" : "none" }}
+      />
+      {imgError && (
+        <div className="img-error">⚠</div>
+      )}
+    </div>
+  );
+};
+
 export const Blog = ({ theme, toggleTheme }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -79,13 +103,7 @@ export const Blog = ({ theme, toggleTheme }) => {
                       className={`card ${project.important ? "card--important" : "card--side"}`}
                     >
                       <div className="card-inner">
-                        <div className="card-img">
-                          <img
-                            src={project.image}
-                            alt={project.title}
-                            loading="lazy"
-                          />
-                        </div>
+                        <CardImage src={project.image} alt={project.title} />
                         <div className="card-body">
                           <h2 className="card-title">{project.title}</h2>
                           <p className="card-desc">{project.description}</p>
