@@ -41,40 +41,51 @@ export const Contact = ({ theme, toggleTheme }) => {
       <div data-theme={theme}>
         <Header onToggleTheme={toggleTheme} />
         <div className="contact">
-          <img className="lines" src={Lines} />
-          <img className="dashed" src={Dashed} />
+          <img className="lines" src={Lines} alt="" aria-hidden="true" />
+          <img className="dashed" src={Dashed} alt="" aria-hidden="true" />
+
           <div className="container">
             <div className="cont-cont">
+
+              {/* Logo side */}
               <div className="right">
                 <img src={Logo} alt="Logo" />
+                <div className="right-text">
+                  <h2>Let's Work<br />Together</h2>
+                  <p>Tell us about your project and we'll get back to you within 24 hours.</p>
+                </div>
               </div>
 
+              {/* Form side */}
               <div className="left">
-                <form className="contact-form" onSubmit={handleSubmit}>
-                  <div className="form-group">
-                    <label htmlFor="name">Name</label>
-                    <input
-                      id="name"
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      placeholder=""
-                      required
-                    />
-                  </div>
+                <form className="contact-form" onSubmit={handleSubmit} noValidate>
 
-                  <div className="form-group">
-                    <label htmlFor="phone">Phone Number</label>
-                    <input
-                      id="phone"
-                      type="tel"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                      placeholder=""
-                      required
-                    />
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label htmlFor="name">Name</label>
+                      <input
+                        id="name"
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="phone">Phone Number</label>
+                      <input
+                        id="phone"
+                        type="tel"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        placeholder="+1 234 567 890"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div className="form-group">
@@ -85,7 +96,7 @@ export const Contact = ({ theme, toggleTheme }) => {
                       name="email"
                       value={form.email}
                       onChange={handleChange}
-                      placeholder=""
+                      placeholder="hello@example.com"
                       required
                     />
                   </div>
@@ -98,22 +109,28 @@ export const Contact = ({ theme, toggleTheme }) => {
                       rows={4}
                       value={form.subject}
                       onChange={handleChange}
+                      placeholder="Tell us about your project..."
                       required
                     />
                   </div>
 
                   {status === "success" && (
-                    <p className="form-msg success">Message sent successfully!</p>
+                    <p className="form-msg success">✓ Message sent successfully!</p>
                   )}
                   {status === "error" && (
-                    <p className="form-msg error">Something went wrong. Try again.</p>
+                    <p className="form-msg error">✕ Something went wrong. Try again.</p>
                   )}
 
                   <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading ? "Sending..." : <>Send To Us <span className="arrow">→</span></>}
+                    {loading
+                      ? <span className="loading-dots">Sending<span>.</span><span>.</span><span>.</span></span>
+                      : <><span>Send To Us</span> <span className="arrow">→</span></>
+                    }
                   </button>
+
                 </form>
               </div>
+
             </div>
           </div>
         </div>

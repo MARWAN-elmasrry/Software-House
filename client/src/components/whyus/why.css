@@ -155,6 +155,9 @@
                 width: 64px;
                 height: 64px;
                 margin-bottom: 24px;
+                img{
+                    width: fit-content;
+                }
             }
 
             h2 {
