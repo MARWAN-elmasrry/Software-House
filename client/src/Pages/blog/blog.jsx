@@ -17,7 +17,7 @@ export const Blog = ({ theme, toggleTheme }) => {
       const res = await getAllBlogs();
       setProjects(Array.isArray(res) ? res : res.data ?? []);
     } catch (err) {
-      setError(err.message ?? "Something went wrong");
+      setError(err.message ?? "Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -86,7 +86,7 @@ export const Blog = ({ theme, toggleTheme }) => {
                             loading="lazy"
                           />
                         </div>
-                        <div className="card-body">
+                         <div className="card-body">
                           <h2 className="card-title">{project.title}</h2>
                           <p className="card-desc">{project.description}</p>
                           <a
