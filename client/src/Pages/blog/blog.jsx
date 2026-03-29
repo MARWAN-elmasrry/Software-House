@@ -5,22 +5,37 @@ import Linesd from "../../assets/linesd.png";
 import { getAllBlogs } from "../../api/service/blogServ";
 import "./blog.css";
 
+// ── Card Image with Skeleton + delay ──────────────────────
 const CardImage = ({ src, alt }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError, setImgError] = useState(false);
+  const [imgError, setImgError]   = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
+  const handleLoad = () => {
+    setImgLoaded(true);
+    setTimeout(() => setShowSkeleton(false), 300); // slight delay so skeleton fades out cleanly
+  };
+
+  const handleError = () => {
+    setImgError(true);
+    setShowSkeleton(false);
+  };
 
   return (
     <div className="card-img">
-      {!imgLoaded && !imgError && (
-        <div className="img-skeleton" />
+      {showSkeleton && !imgError && (
+        <div className={`img-skeleton ${imgLoaded ? "img-skeleton--fade" : ""}`} />
       )}
       <img
         src={src}
         alt={alt}
         loading="lazy"
-        onLoad={() => setImgLoaded(true)}
-        onError={() => setImgError(true)}
-        style={{ display: imgLoaded ? "block" : "none" }}
+        onLoad={handleLoad}
+        onError={handleError}
+        style={{
+          opacity: imgLoaded ? 1 : 0,
+          transition: "opacity 0.3s ease",
+        }}
       />
       {imgError && (
         <div className="img-error">⚠</div>
@@ -29,6 +44,7 @@ const CardImage = ({ src, alt }) => {
   );
 };
 
+// ── Main Component ─────────────────────────────────────────
 export const Blog = ({ theme, toggleTheme }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -41,7 +57,7 @@ export const Blog = ({ theme, toggleTheme }) => {
       const res = await getAllBlogs();
       setProjects(Array.isArray(res) ? res : res.data ?? []);
     } catch (err) {
-      setError(err.message ?? "Something went wrong");
+      setError(err.message ?? "Something went wrong!");
     } finally {
       setLoading(false);
     }
