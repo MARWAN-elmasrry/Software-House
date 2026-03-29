@@ -52,14 +52,13 @@ export const Contact = ({ theme, toggleTheme }) => {
                 <img src={Logo} alt="Logo" />
                 <div className="right-text">
                   <h2>Let's Work<br />Together</h2>
-                  <p>Tell us about your project and we'll get back to you within 24 hours.</p>
                 </div>
               </div>
 
               {/* Form side */}
               <div className="left">
                 <form className="contact-form" onSubmit={handleSubmit} noValidate>
-
+                  <p>Tell us about your project and we'll get back to you within 24 hours.</p>
                   <div className="form-row">
                     <div className="form-group">
                       <label htmlFor="name">Name</label>
