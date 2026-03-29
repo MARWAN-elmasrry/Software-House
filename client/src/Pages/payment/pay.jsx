@@ -17,7 +17,7 @@ const UploadIcon     = ({ size = 24, color = "currentColor" }) => (<svg width={s
 const InfoIcon       = ({ size = 18, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>);
 const TagIcon        = ({ size = 20, color = "currentColor" }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>);
 
-const formatPrice       = (num) => "$" + num.toLocaleString("en-US", { minimumFractionDigits: 0 });
+const formatPrice       = (num) => "£" + num.toLocaleString("en-US", { minimumFractionDigits: 0 });
 const getTodayFormatted = () => new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
 const SECTION_LABELS = { web: "🌐 Web", ai: "🤖 AI", mobile: "📱 Mobile", embedded: "🔌 Embedded", "3d": "🎲 3D" };

@@ -162,12 +162,12 @@ const PlanCard = ({ plan }) => {
             <p className="card-tagline">{plan.tagline}</p>
 
             <div className="card-price-container">
-                <div className="card-price-original">{fmt(originalPrice)}</div>
-                <div className="card-price">{fmt(discountedPrice)}</div>
+                <div className="card-price-original"> £{fmt(originalPrice)}</div>
+                <div className="card-price"> £{fmt(discountedPrice)}</div>
             </div>
 
             <div className="card-discount-badge">
-                Save ${fmt(DISCOUNT_AMOUNT)}
+                Save £{fmt(DISCOUNT_AMOUNT)}
             </div>
 
             <Link
@@ -226,7 +226,7 @@ export const Package = ({ theme, toggleTheme }) => {
                             {/* ══ LIMITED TIME OFFER BADGE ══ */}
                             <div className="pack-limited-offer">
                                 <span className="pack-limited-offer__icon">🔥</span>
-                                <span className="pack-limited-offer__text">Limited Time: <strong>${fmt(DISCOUNT_AMOUNT)} OFF</strong> All Packages</span>
+                                <span className="pack-limited-offer__text">Limited Time: <strong>£{fmt(DISCOUNT_AMOUNT)} OFF</strong> All Packages</span>
                             </div>
 
                             {/* ══ HELP BUTTON ══ */}

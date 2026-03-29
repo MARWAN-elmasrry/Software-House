@@ -5,6 +5,46 @@ import Linesd from "../../assets/linesd.png";
 import { getAllBlogs } from "../../api/service/blogServ";
 import "./blog.css";
 
+// ── Card Image with Skeleton + delay ──────────────────────
+const CardImage = ({ src, alt }) => {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError]   = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(true);
+
+  const handleLoad = () => {
+    setImgLoaded(true);
+    setTimeout(() => setShowSkeleton(false), 300); // slight delay so skeleton fades out cleanly
+  };
+
+  const handleError = () => {
+    setImgError(true);
+    setShowSkeleton(false);
+  };
+
+  return (
+    <div className="card-img">
+      {showSkeleton && !imgError && (
+        <div className={`img-skeleton ${imgLoaded ? "img-skeleton--fade" : ""}`} />
+      )}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onLoad={handleLoad}
+        onError={handleError}
+        style={{
+          opacity: imgLoaded ? 1 : 0,
+          transition: "opacity 0.3s ease",
+        }}
+      />
+      {imgError && (
+        <div className="img-error">⚠</div>
+      )}
+    </div>
+  );
+};
+
+// ── Main Component ─────────────────────────────────────────
 export const Blog = ({ theme, toggleTheme }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -79,14 +119,8 @@ export const Blog = ({ theme, toggleTheme }) => {
                       className={`card ${project.important ? "card--important" : "card--side"}`}
                     >
                       <div className="card-inner">
-                        <div className="card-img">
-                          <img
-                            src={project.image}
-                            alt={project.title}
-                            loading="lazy"
-                          />
-                        </div>
-                         <div className="card-body">
+                        <CardImage src={project.image} alt={project.title} />
+                        <div className="card-body">
                           <h2 className="card-title">{project.title}</h2>
                           <p className="card-desc">{project.description}</p>
                           <a
