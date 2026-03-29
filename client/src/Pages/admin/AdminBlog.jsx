@@ -36,6 +36,30 @@ const StarIcon = ({ filled }) => (
   </svg>
 );
 
+// ── Card Image with Skeleton ───────────────────────────────
+const CardImage = ({ src, alt }) => {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError]   = useState(false);
+
+  return (
+    <div className="ab-card__img">
+      {!imgLoaded && !imgError && (
+        <div className="ab-img-skeleton" />
+      )}
+      <img
+        src={src}
+        alt={alt}
+        onLoad={() => setImgLoaded(true)}
+        onError={() => setImgError(true)}
+        style={{ display: imgLoaded ? "block" : "none" }}
+      />
+      {imgError && (
+        <div className="ab-img-error">⚠</div>
+      )}
+    </div>
+  );
+};
+
 // ── Modal ──────────────────────────────────────────────────
 const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
   <div className="ab-overlay" onClick={onClose}>
@@ -79,14 +103,13 @@ const Modal = ({ form, onChange, onSave, onClose, isEdit }) => (
 // ── Main Component ─────────────────────────────────────────
 export const AdminBlog = () => {
   const [projects, setProjects]   = useState([]);
-  const [modal, setModal]         = useState(null); // null | "add" | "edit"
+  const [modal, setModal]         = useState(null);
   const [form, setForm]           = useState(emptyForm);
   const [editId, setEditId]       = useState(null);
   const [deleteId, setDeleteId]   = useState(null);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState(null);
 
-  // ─── Fetch on mount ──────────────────────────────────────
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
@@ -102,13 +125,11 @@ export const AdminBlog = () => {
     fetchBlogs();
   }, []);
 
-  const handleField = (key, val) => setForm((f) => ({ ...f, [key]: val }));
+  const handleField  = (key, val) => setForm((f) => ({ ...f, [key]: val }));
+  const openAdd      = () => { setForm(emptyForm); setModal("add"); };
+  const openEdit     = (p) => { setForm({ title: p.title, description: p.description, image: p.image, important: p.important, link: p.link }); setEditId(p._id); setModal("edit"); };
+  const closeModal   = () => { setModal(null); setEditId(null); };
 
-  const openAdd   = () => { setForm(emptyForm); setModal("add"); };
-  const openEdit  = (p) => { setForm({ title: p.title, description: p.description, image: p.image, important: p.important, link: p.link }); setEditId(p._id); setModal("edit"); };
-  const closeModal = () => { setModal(null); setEditId(null); };
-
-  // ─── Create / Update ─────────────────────────────────────
   const handleSave = async () => {
     if (!form.title.trim()) return;
     try {
@@ -125,7 +146,6 @@ export const AdminBlog = () => {
     }
   };
 
-  // ─── Delete ───────────────────────────────────────────────
   const handleDelete = async (id) => {
     try {
       await deleteBlog(id);
@@ -136,7 +156,6 @@ export const AdminBlog = () => {
     }
   };
 
-  // ─── Toggle Featured ⭐ ───────────────────────────────────
   const toggleImportant = async (id) => {
     try {
       const res = await toggleImportantApi(id);
@@ -146,7 +165,6 @@ export const AdminBlog = () => {
     }
   };
 
-  // ─── UI States ────────────────────────────────────────────
   if (loading) return <div className="ab"><p style={{ padding: "2rem" }}>Loading blog projects...</p></div>;
   if (error)   return <div className="ab"><p style={{ padding: "2rem", color: "red" }}>Error: {error}</p></div>;
 
@@ -169,10 +187,11 @@ export const AdminBlog = () => {
       <div className="ab__grid">
         {projects.map((p) => (
           <div key={p._id} className={`ab-card ${p.important ? "ab-card--featured" : ""}`}>
-            <div className="ab-card__img">
-              <img src={p.image} alt={p.title} />
-              {p.important && <span className="ab-card__badge">Featured</span>}
-            </div>
+
+            {/* ── Replaced plain img with CardImage ── */}
+            <CardImage src={p.image} alt={p.title} />
+            {p.important && <span className="ab-card__badge">Featured</span>}
+
             <div className="ab-card__body">
               <h3 className="ab-card__title">{p.title}</h3>
               <p className="ab-card__desc">{p.description}</p>
@@ -196,7 +215,6 @@ export const AdminBlog = () => {
           </div>
         ))}
 
-        {/* Empty state */}
         {projects.length === 0 && (
           <div className="ab__empty">
             <p>No projects yet.</p>
@@ -207,13 +225,7 @@ export const AdminBlog = () => {
 
       {/* Add / Edit Modal */}
       {modal && (
-        <Modal
-          form={form}
-          onChange={handleField}
-          onSave={handleSave}
-          onClose={closeModal}
-          isEdit={modal === "edit"}
-        />
+        <Modal form={form} onChange={handleField} onSave={handleSave} onClose={closeModal} isEdit={modal === "edit"} />
       )}
 
       {/* Delete Confirm */}

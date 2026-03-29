@@ -30,7 +30,7 @@
                     font-size: 4rem;
                     font-weight: bolder;
                     transition: transform 0.3s ease, box-shadow 0.3s ease;
-                                        color: var(--text-color);
+                    color: var(--text-color);
 
                     &:hover {
                         transform: translateY(-3px);
@@ -150,7 +150,7 @@
                             text-decoration: none;
                             cursor: pointer;
                             transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
-                    color: var(--text-color);
+                            color: var(--text-color);
 
                             &:hover {
                                 background-color: var(--text-color);
