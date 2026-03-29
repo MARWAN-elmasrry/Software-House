@@ -79,15 +79,6 @@
                 color: var(--text-color);
                 margin: 0 0 0.75rem;
             }
-
-            p {
-                font-size: clamp(0.8rem, 1.2vw, 0.95rem);
-                color: var(--text-color);
-                opacity: 0.6;
-                max-width: 260px;
-                line-height: 1.6;
-                margin: 0 auto;
-            }
         }
     }
 
@@ -103,6 +94,9 @@
         display: flex;
         flex-direction: column;
         gap: 1.4rem;
+        p{
+            font-size: 1.5rem;
+        }
     }
 
     /* Side-by-side row for name + phone on wider screens */
