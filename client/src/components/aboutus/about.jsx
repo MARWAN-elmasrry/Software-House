@@ -40,7 +40,6 @@ export const AboutUs = () => {
             <h1>About Us</h1>
             <p>We are not just a dev shop. We are a team of dedicated engineers, architects, and designers passionate about shipping high-quality software that solves real business problems.</p>
             <p>Our approach combines deep technical expertise with a keen understanding of user experience. We believe that the best code is the code that delivers value, scales effortlessly, and remains maintainable for years to come.</p>
-            <a href="#">Read our Manifesto →</a>
           </div>
           <div className="cards">
             {statsData.map((stat) => (

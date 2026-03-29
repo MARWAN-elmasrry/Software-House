@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink , useLocation } from 'react-router-dom'
 import Logo from '../../assets/logo.png'
 import './header.css'
 
@@ -9,6 +9,7 @@ export const Header = ({ onToggleTheme }) => {
     return savedTheme === 'dark';
   });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const location = useLocation();
 
   const handleToggle = (e) => {
     setIsDark(e.target.checked)
@@ -21,21 +22,28 @@ export const Header = ({ onToggleTheme }) => {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  }
+  const onClickMenu = () => {
+    setIsMenuOpen(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+  const goUp = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
 
   return (
     <header>
         <div className="head-cont">
-          <NavLink to="/" className="logo"  onClick={closeMenu}>
+          <NavLink to="/" className="logo"  onClick={goUp}>
             <img src={Logo} alt="SoftWareHouseIMG" />
             <h2>Softuuare House</h2>
           </NavLink>
           
           <div className={`links ${isMenuOpen ? 'active' : ''}`}>
-            <NavLink to="/pack" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Packages</NavLink>
-            <NavLink to="/blog" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Blog</NavLink>
-            <NavLink to="/contact" className={({ isActive }) => isActive ? 'active' : ''} onClick={closeMenu}>Contact Us</NavLink>
+            <NavLink to="/pack" className={({ isActive }) => isActive ? 'active' : ''} onClick={onClickMenu}>Packages</NavLink>
+            <NavLink to="/blog" className={({ isActive }) => isActive ? 'active' : ''} onClick={onClickMenu}>Blog</NavLink>
+            <NavLink to="/contact" className={({ isActive }) => isActive ? 'active' : ''} onClick={onClickMenu}>Contact Us</NavLink>
           </div> 
           
           <div className="header-btn">
@@ -59,10 +67,14 @@ export const Header = ({ onToggleTheme }) => {
               </label>
             </div>
             <div className="start-btn">
-              <Link to="/pack">
-                <button>Start a Project</button>
-              </Link>
-            </div>
+              {location.pathname !== '/pack' ? (
+                <Link to="/pack">
+                  <button className="header-cta start">Start a Project</button>
+                </Link>
+              ) : (
+                <button className="header-cta choose">Choose & Build</button>
+              )}
+            </div>          
             <button className="hamburger" onClick={toggleMenu} aria-label="Toggle menu">
               <span className={isMenuOpen ? 'active' : ''}></span>
               <span className={isMenuOpen ? 'active' : ''}></span>
