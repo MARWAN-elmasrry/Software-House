@@ -304,14 +304,6 @@ export const Package = ({ theme, toggleTheme }) => {
                             </div>
                         </div>
 
-                        {/* ══ 3D SECTION ══ */}
-                        <div className="pack-section-divider">
-                            <div className="section-label threed-label">
-                                <span className="section-tag threed-tag">3D & IMMERSIVE</span>
-                                <h2>Custom 3D Experiences <span>Beyond the Screen</span></h2>
-                                <p>Every 3D project is unique. Pricing depends on scope, complexity, and assets. Let's talk about your vision.</p>
-                            </div>
-                        </div>
                         {/* ══ CONTACT FORM ══ */}
                         <div className="contact-section" ref={contactRef}>
                             <div className="contact-head">
