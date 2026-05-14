@@ -313,7 +313,7 @@ export const Package = ({ theme, toggleTheme }) => {
                                         ? "Your Embedded Project" 
                                         : formType === "help" 
                                         ? "Your Needs" 
-                                        : "Your 3D Project"}
+                                        : "Your Embedded Project"}
                                 </span></h2>
                                 <p>
                                     {formType === "help" 
