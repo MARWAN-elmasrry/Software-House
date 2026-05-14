@@ -312,27 +312,6 @@ export const Package = ({ theme, toggleTheme }) => {
                                 <p>Every 3D project is unique. Pricing depends on scope, complexity, and assets. Let's talk about your vision.</p>
                             </div>
                         </div>
-
-                        <div className="threed-section">
-                            <div className="threed-card">
-                                <div className="threed-orb threed-orb-1" />
-                                <div className="threed-orb threed-orb-2" />
-                                <div className="threed-orb threed-orb-3" />
-                                <div className="threed-content">
-                                    <div className="threed-badge">CUSTOM PRICING</div>
-                                    <h3 className="threed-title">3D Design & Development</h3>
-                                    <p className="threed-desc">Interactive 3D web experiences, product configurators, architectural visualizations, and immersive WebGL scenes — crafted to your exact specifications.</p>
-                                    <ul className="threed-features">
-                                        {["WebGL & Three.js Development","3D Product Configurators","Architectural Visualization","Immersive Landing Pages","Custom Asset Creation","Performance Optimization"].map((f) => (
-                                            <li key={f}><span className="threed-check">✦</span> {f}</li>
-                                        ))}
-                                    </ul>
-                                    <div className="threed-price-note">Price varies based on scope &amp; complexity</div>
-                                    <button className="threed-cta" onClick={() => scrollToContact("3d")}>Book a Free Call</button>
-                                </div>
-                            </div>
-                        </div>
-
                         {/* ══ CONTACT FORM ══ */}
                         <div className="contact-section" ref={contactRef}>
                             <div className="contact-head">

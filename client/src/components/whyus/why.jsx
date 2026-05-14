@@ -48,16 +48,6 @@ export const WhyUs = () => {
                         
                         <div className="card">
                             <div className="card-icon">
-                                <img src={Design} alt="Design" />
-                            </div>
-                            <div className="h2">
-                                <h2>3D Design</h2>
-                            </div>
-                            <p>We craft intuitive interfaces and seamless experiences that users love and businesses trust.</p>
-                        </div>
-                        
-                        <div className="card">
-                            <div className="card-icon">
                                 <img src={Digital} alt="Digital" />
                             </div>
                             <div className="h2">
