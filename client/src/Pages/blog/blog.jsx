@@ -5,59 +5,61 @@ import Linesd from "../../assets/linesd.png";
 import { getAllBlogs } from "../../api/service/blogServ";
 import "./blog.css";
 
-// ── Card Image with Skeleton + delay ──────────────────────
-const CardImage = ({ src, alt }) => {
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError, setImgError]   = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true);
+const DEMO_BLOGS = [
+  {
+    _id: "demo-1",
+    title: "Building Scalable React Apps",
+    description:
+      "A look at patterns and structures that keep React codebases maintainable as they grow.",
+    image: "https://picsum.photos/seed/blog1/600/400",
+    link: "https://linkedin.com/in/example",
+    important: true,
+  },
+  {
+    _id: "demo-2",
+    title: "Node.js Performance Tips",
+    description:
+      "Practical techniques for speeding up Express APIs and MongoDB queries in production.",
+    image: "https://picsum.photos/seed/blog2/600/400",
+    link: "#",
+    important: false,
+  },
+  {
+    _id: "demo-3",
+    title: "From Accounting to Full-Stack Dev",
+    description:
+      "Notes on transitioning careers into software engineering and what actually helped.",
+    image: "https://picsum.photos/seed/blog3/600/400",
+    link: "#",
+    important: false,
+  },
+];
 
-  const handleLoad = () => {
-    setImgLoaded(true);
-    setTimeout(() => setShowSkeleton(false), 300); // slight delay so skeleton fades out cleanly
-  };
-
-  const handleError = () => {
-    setImgError(true);
-    setShowSkeleton(false);
-  };
-
-  return (
-    <div className="card-img">
-      {showSkeleton && !imgError && (
-        <div className={`img-skeleton ${imgLoaded ? "img-skeleton--fade" : ""}`} />
-      )}
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        onLoad={handleLoad}
-        onError={handleError}
-        style={{
-          opacity: imgLoaded ? 1 : 0,
-          transition: "opacity 0.3s ease",
-        }}
-      />
-      {imgError && (
-        <div className="img-error">⚠</div>
-      )}
-    </div>
-  );
-};
-
-// ── Main Component ─────────────────────────────────────────
 export const Blog = ({ theme, toggleTheme }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
+  const [isDemo, setIsDemo]     = useState(false);
 
   const fetchBlogs = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
+      setIsDemo(false);
       const res = await getAllBlogs();
-      setProjects(Array.isArray(res) ? res : res.data ?? []);
+      const data = Array.isArray(res) ? res : res.data ?? [];
+
+      if (data.length === 0) {
+        // Treat an empty response as "nothing to show", not a failure
+        setProjects([]);
+      } else {
+        setProjects(data);
+      }
     } catch (err) {
-      setError(err.message ?? "Something went wrong!");
+      // API failed — fall back to demo content instead of an error screen
+      setError(err.message ?? "Something went wrong");
+      setProjects(DEMO_BLOGS);
+      setIsDemo(true);
     } finally {
       setLoading(false);
     }
@@ -83,11 +85,21 @@ export const Blog = ({ theme, toggleTheme }) => {
               <div className="blog-head">
                 <h1>LETS SEE WHERE WE GO TO THE POINT</h1>
                 <div className="btn">
-                  <button>Portfolio</button>
+                  <button>Resume</button>
                 </div>
                 <img src={Linesd} />
               </div>
+
               <div className="blog-info">
+                {isDemo && !loading && (
+                  <div className="demo-banner">
+                    <span>⚠ Couldn't reach the server — showing demo posts.</span>
+                    <button className="error-retry" onClick={fetchBlogs}>
+                      Retry
+                    </button>
+                  </div>
+                )}
+
                 <div className="cards">
 
                   {loading && (
@@ -96,34 +108,29 @@ export const Blog = ({ theme, toggleTheme }) => {
                     </div>
                   )}
 
-                  {error && !loading && (
-                    <div className="error-state">
-                      <div className="error-icon">⚠</div>
-                      <p className="error-title">Failed to load posts</p>
-                      <p className="error-msg">{error}</p>
-                      <button className="error-retry" onClick={fetchBlogs}>
-                        Try again
-                      </button>
-                    </div>
-                  )}
-
-                  {!loading && !error && projects.length === 0 && (
+                  {!loading && !isDemo && !error && projects.length === 0 && (
                     <div className="empty-state">
                       <p>No posts found.</p>
                     </div>
                   )}
 
-                  {!loading && !error && projects.map((project) => (
+                  {!loading && projects.map((project) => (
                     <div
                       key={project._id}
                       className={`card ${project.important ? "card--important" : "card--side"}`}
                     >
                       <div className="card-inner">
-                        <CardImage src={project.image} alt={project.title} />
+                        <div className="card-img">
+                          <img
+                            src={project.image}
+                            alt={project.title}
+                            loading="lazy"
+                          />
+                        </div>
                         <div className="card-body">
                           <h2 className="card-title">{project.title}</h2>
                           <p className="card-desc">{project.description}</p>
-                          <a
+                          
                             href={project.link}
                             className="card-btn"
                             target="_blank"
