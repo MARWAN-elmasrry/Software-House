@@ -99,7 +99,7 @@ export const Blog = ({ theme, toggleTheme }) => {
                         <div className="card-body">
                           <h2 className="card-title">{project.title}</h2>
                           <p className="card-desc">{project.description}</p>
-                          
+                          <a
                             href={project.link}
                             className="card-btn"
                             target="_blank"
