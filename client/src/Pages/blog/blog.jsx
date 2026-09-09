@@ -3,34 +3,29 @@ import { Footer } from "../../components/footer/footer";
 import { Header } from "../../components/header/header";
 import Linesd from "../../assets/linesd.png";
 import { getAllBlogs } from "../../api/service/blogServ";
+import ModlPreview from "../../assets/projects/modl.png";
+import GaddhaPreview from "../../assets/projects/gaddha.png";
 import "./blog.css";
 
-const DEMO_BLOGS = [
+// Real portfolio projects — shown if the API request fails,
+// so the page never shows an empty/error state to visitors.
+const REAL_PROJECTS = [
   {
-    _id: "demo-1",
-    title: "Building Scalable React Apps",
+    _id: "modl-digital-craft",
+    title: "MODL – Digital Craft",
     description:
-      "A look at patterns and structures that keep React codebases maintainable as they grow.",
-    image: "https://picsum.photos/seed/blog1/600/400",
-    link: "https://linkedin.com/in/example",
+      "A digital architecture studio site for parametric design, 3D visualization, and urban simulation — RTL Arabic UI with a dark, editorial aesthetic.",
+    image: ModlPreview,
+    link: "https://www.modl.work/",
     important: true,
   },
   {
-    _id: "demo-2",
-    title: "Node.js Performance Tips",
+    _id: "gaddha",
+    title: "قدها ولا بس سوالف؟",
     description:
-      "Practical techniques for speeding up Express APIs and MongoDB queries in production.",
-    image: "https://picsum.photos/seed/blog2/600/400",
-    link: "#",
-    important: false,
-  },
-  {
-    _id: "demo-3",
-    title: "From Accounting to Full-Stack Dev",
-    description:
-      "Notes on transitioning careers into software engineering and what actually helped.",
-    image: "https://picsum.photos/seed/blog3/600/400",
-    link: "#",
+      "An interactive Saudi/Gulf trivia game platform — team-based categories, lifelines, and timers designed for social gatherings.",
+    image: GaddhaPreview,
+    link: "https://gaddha.vercel.app/",
     important: false,
   },
 ];
@@ -39,20 +34,18 @@ export const Blog = ({ theme, toggleTheme }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isDemo, setIsDemo] = useState(false);
 
   const fetchBlogs = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      setIsDemo(false);
       const res = await getAllBlogs();
       const data = Array.isArray(res) ? res : res.data ?? [];
-      setProjects(data);
+      // If the API returns nothing useful, still show real work instead of an empty page
+      setProjects(data.length > 0 ? data : REAL_PROJECTS);
     } catch (err) {
       setError(err.message ?? "Something went wrong");
-      setProjects(DEMO_BLOGS);
-      setIsDemo(true);
+      setProjects(REAL_PROJECTS);
     } finally {
       setLoading(false);
     }
@@ -83,17 +76,10 @@ export const Blog = ({ theme, toggleTheme }) => {
             </div>
 
             <div className="blog-info">
-
               <div className="cards">
                 {loading && (
                   <div className="loader-wrapper">
                     <div className="loader"></div>
-                  </div>
-                )}
-
-                {!loading && !isDemo && !error && projects.length === 0 && (
-                  <div className="empty-state">
-                    <p>No posts found.</p>
                   </div>
                 )}
 
@@ -116,7 +102,7 @@ export const Blog = ({ theme, toggleTheme }) => {
                         <div className="card-body">
                           <h2 className="card-title">{project.title}</h2>
                           <p className="card-desc">{project.description}</p>
-                          <a
+                          
                             href={project.link}
                             className="card-btn"
                             target="_blank"
