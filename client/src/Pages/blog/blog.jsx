@@ -37,9 +37,9 @@ const DEMO_BLOGS = [
 
 export const Blog = ({ theme, toggleTheme }) => {
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading]   = useState(true);
-  const [error, setError]       = useState(null);
-  const [isDemo, setIsDemo]     = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isDemo, setIsDemo] = useState(false);
 
   const fetchBlogs = useCallback(async () => {
     try {
@@ -48,15 +48,8 @@ export const Blog = ({ theme, toggleTheme }) => {
       setIsDemo(false);
       const res = await getAllBlogs();
       const data = Array.isArray(res) ? res : res.data ?? [];
-
-      if (data.length === 0) {
-        // Treat an empty response as "nothing to show", not a failure
-        setProjects([]);
-      } else {
-        setProjects(data);
-      }
+      setProjects(data);
     } catch (err) {
-      // API failed — fall back to demo content instead of an error screen
       setError(err.message ?? "Something went wrong");
       setProjects(DEMO_BLOGS);
       setIsDemo(true);
@@ -76,48 +69,41 @@ export const Blog = ({ theme, toggleTheme }) => {
   };
 
   return (
-    <>
-      <div data-theme={theme}>
-        <Header onToggleTheme={toggleTheme} />
-        <div className="blog">
-          <div className="container">
-            <div className="blog-cont">
-              <div className="blog-head">
-                <h1>LETS SEE WHERE WE GO TO THE POINT</h1>
-                <div className="btn">
-                  <button>Resume</button>
-                </div>
-                <img src={Linesd} />
+    <div data-theme={theme}>
+      <Header onToggleTheme={toggleTheme} />
+      <div className="blog">
+        <div className="container">
+          <div className="blog-cont">
+            <div className="blog-head">
+              <h1>LETS SEE WHERE WE GO TO THE POINT</h1>
+              <div className="btn">
+                <button>Resume</button>
               </div>
+              <img src={Linesd} alt="" />
+            </div>
 
-              <div className="blog-info">
-                {isDemo && !loading && (
-                  <div className="demo-banner">
-                    <span>⚠ Couldn't reach the server — showing demo posts.</span>
-                    <button className="error-retry" onClick={fetchBlogs}>
-                      Retry
-                    </button>
+            <div className="blog-info">
+
+              <div className="cards">
+                {loading && (
+                  <div className="loader-wrapper">
+                    <div className="loader"></div>
                   </div>
                 )}
 
-                <div className="cards">
+                {!loading && !isDemo && !error && projects.length === 0 && (
+                  <div className="empty-state">
+                    <p>No posts found.</p>
+                  </div>
+                )}
 
-                  {loading && (
-                    <div className="loader-wrapper">
-                      <div className="loader"></div>
-                    </div>
-                  )}
-
-                  {!loading && !isDemo && !error && projects.length === 0 && (
-                    <div className="empty-state">
-                      <p>No posts found.</p>
-                    </div>
-                  )}
-
-                  {!loading && projects.map((project) => (
+                {!loading &&
+                  projects.map((project) => (
                     <div
                       key={project._id}
-                      className={`card ${project.important ? "card--important" : "card--side"}`}
+                      className={`card ${
+                        project.important ? "card--important" : "card--side"
+                      }`}
                     >
                       <div className="card-inner">
                         <div className="card-img">
@@ -130,7 +116,7 @@ export const Blog = ({ theme, toggleTheme }) => {
                         <div className="card-body">
                           <h2 className="card-title">{project.title}</h2>
                           <p className="card-desc">{project.description}</p>
-                          
+                          <a
                             href={project.link}
                             className="card-btn"
                             target="_blank"
@@ -142,14 +128,12 @@ export const Blog = ({ theme, toggleTheme }) => {
                       </div>
                     </div>
                   ))}
-
-                </div>
               </div>
             </div>
           </div>
         </div>
-        <Footer />
       </div>
-    </>
+      <Footer />
+    </div>
   );
 };
