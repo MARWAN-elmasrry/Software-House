@@ -3,19 +3,16 @@ import { Footer } from "../../components/footer/footer";
 import { Header } from "../../components/header/header";
 import Linesd from "../../assets/linesd.png";
 import { getAllBlogs } from "../../api/service/blogServ";
-import ModlPreview from "../../assets/projects/modl.png";
-import GaddhaPreview from "../../assets/projects/gaddha.png";
 import "./blog.css";
 
-// Real portfolio projects — shown if the API request fails,
-// so the page never shows an empty/error state to visitors.
 const REAL_PROJECTS = [
   {
     _id: "modl-digital-craft",
     title: "MODL – Digital Craft",
     description:
       "A digital architecture studio site for parametric design, 3D visualization, and urban simulation — RTL Arabic UI with a dark, editorial aesthetic.",
-    image: ModlPreview,
+    image:
+      "https://drive.google.com/uc?export=view&id=AKGpihbCdunojRFKyq9CP2GMM1mKaO8-xkJJ53a95ZqB1znhRct48qW3euB76co12SGFIyOquO--TvJxGqZ8OtjGDMIm_2AN2Ad5_u0",
     link: "https://www.modl.work/",
     important: true,
   },
@@ -24,7 +21,8 @@ const REAL_PROJECTS = [
     title: "قدها ولا بس سوالف؟",
     description:
       "An interactive Saudi/Gulf trivia game platform — team-based categories, lifelines, and timers designed for social gatherings.",
-    image: GaddhaPreview,
+    image:
+      "https://drive.google.com/uc?export=view&id=AKGpihasB3sRptEQMHp0ABzhmzD7igJnFXSNw6zDBr6v9seGzJ4vt20_840nZrlY3e5q_JCRMH4Ql-ywbJQiPWPeb-HJUdKaaWxFfLw",
     link: "https://gaddha.vercel.app/",
     important: false,
   },
@@ -41,7 +39,6 @@ export const Blog = ({ theme, toggleTheme }) => {
       setError(null);
       const res = await getAllBlogs();
       const data = Array.isArray(res) ? res : res.data ?? [];
-      // If the API returns nothing useful, still show real work instead of an empty page
       setProjects(data.length > 0 ? data : REAL_PROJECTS);
     } catch (err) {
       setError(err.message ?? "Something went wrong");
