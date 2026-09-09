@@ -12,7 +12,7 @@ const REAL_PROJECTS = [
     description:
       "A digital architecture studio site for parametric design, 3D visualization, and urban simulation — RTL Arabic UI with a dark, editorial aesthetic.",
     image:
-      "https://drive.google.com/uc?export=view&id=AKGpihbCdunojRFKyq9CP2GMM1mKaO8-xkJJ53a95ZqB1znhRct48qW3euB76co12SGFIyOquO--TvJxGqZ8OtjGDMIm_2AN2Ad5_u0",
+      "https://drive.google.com/u/0/drive-viewer/AKGpihYBcAEFYbK8wBTWzl0iyyjccY5rvI6lbpeGUTW8JkG4GRGUOILICxMqKC7n6zsEPfjdFR5ENVv9kjDMePH0Wx50RHQDiZqPbbc=s1600-rw-v1?auditContext=forDisplay",
     link: "https://www.modl.work/",
     important: true,
   },
@@ -22,7 +22,7 @@ const REAL_PROJECTS = [
     description:
       "An interactive Saudi/Gulf trivia game platform — team-based categories, lifelines, and timers designed for social gatherings.",
     image:
-      "https://drive.google.com/uc?export=view&id=AKGpihasB3sRptEQMHp0ABzhmzD7igJnFXSNw6zDBr6v9seGzJ4vt20_840nZrlY3e5q_JCRMH4Ql-ywbJQiPWPeb-HJUdKaaWxFfLw",
+      "https://drive.google.com/u/0/drive-viewer/AKGpihYs4zsBLu0TldN3XhE7AC2RXP7qxV6D5SSKiiWlQordS2X4-BLMsnTPtouQje3TPtCeoNVo8vgYCmTRo6SZVul3g2XE1pSBJ5U=s1600-rw-v1?auditContext=forDisplay",
     link: "https://gaddha.vercel.app/",
     important: false,
   },
